@@ -9,17 +9,17 @@ export default {
       colors: {
         brand: {
           navy: {
-            50: '#f0f4f8',
-            100: '#d9e2ec',
-            200: '#bcccdc',
-            300: '#9fb3c8',
-            400: '#829ab1',
-            500: '#627d98',
-            600: '#486581',
-            700: '#334e68',
-            800: '#243e56',
-            900: '#162e46', // Steel Slate Blue
-            950: '#0b1c2c', // Deep Steel Navy
+            50: '#f9f9f9',
+            100: '#f1f1f1',
+            200: '#e3e3e3',
+            300: '#cdcdcd',
+            400: '#b3b3b3',
+            500: '#999999',
+            600: '#7f7f7f',
+            700: '#555555',
+            800: '#1f1f1f',
+            900: '#0a0a0a', // Luxury Matte Black
+            950: '#000000', // Pure Black
           },
           gold: {
             50: '#fff5f5',
