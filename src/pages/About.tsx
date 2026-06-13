@@ -72,7 +72,7 @@ export const About: React.FC = () => {
             {/* License Overlay Badges */}
             <div className="absolute -bottom-6 -left-6 bg-brand-navy-900 text-white rounded-2xl p-5 border border-white/10 shadow-2xl max-w-xs">
               <p className="text-[10px] text-brand-gold-400 uppercase tracking-widest font-extrabold mb-1">State Licensure</p>
-              <p className="font-display font-extrabold text-base leading-tight text-white">License ID: #AL-49281</p>
+              <p className="font-display font-extrabold text-base leading-tight text-white">Fully Licensed, Bonded & Insured</p>
               <p className="text-xs text-slate-400 mt-2">Validated with the Alabama Electrical Contractors Board. Fully Insured & Bonded.</p>
             </div>
           </div>

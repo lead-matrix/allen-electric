@@ -167,7 +167,7 @@ export const InteractiveMap: React.FC = () => {
           <div className="absolute top-2 left-2 bg-white/5 border border-white/10 rounded-xl p-2.5 text-[10px] hidden md:block backdrop-blur-sm">
             <div className="flex items-center gap-1.5 text-brand-gold-400 font-bold mb-0.5">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>AL License #49281</span>
+              <span>Statewide Licensed</span>
             </div>
             <p className="text-slate-400">NEC Compliant Electricians</p>
           </div>

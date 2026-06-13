@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { dbService } from '../lib/supabase';
+import { dbService, supabase } from '../lib/supabase';
 import { 
   Lock, 
   Users, 
@@ -13,7 +13,8 @@ import {
   Phone,
   Mail,
   Zap,
-  Tag
+  Tag,
+  X
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
@@ -35,6 +36,9 @@ export const AdminDashboard: React.FC = () => {
   // Email notifications mock logs
   const [emailLogs, setEmailLogs] = useState<string[]>([]);
 
+  // View mode toggle: list view or Kanban pipeline board
+  const [viewMode, setViewMode] = useState<'list' | 'pipeline'>('pipeline');
+
   const loadLeads = async () => {
     try {
       const data = await dbService.getLeads();
@@ -45,15 +49,64 @@ export const AdminDashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    if (isLoggedIn) {
-      loadLeads();
-      // Add initial mock email logs
-      setEmailLogs([
-        `[${new Date().toLocaleTimeString()}] System: Email notification template listening active.`,
-        `[${new Date(Date.now() - 3600000).toLocaleTimeString()}] Alert: Booking confirmation emailed to jane.doe@gmail.com.`,
-        `[${new Date(Date.now() - 7200000).toLocaleTimeString()}] Alert: Dispatch lead email dispatched to dispatch@allenelectric.co.`
-      ]);
+    if (!isLoggedIn) return;
+
+    loadLeads();
+
+    // Add initial mock email logs
+    setEmailLogs([
+      `[${new Date().toLocaleTimeString()}] System: Email notification template listening active.`,
+      `[${new Date(Date.now() - 3600000).toLocaleTimeString()}] Alert: Booking confirmation emailed to jane.doe@gmail.com.`,
+      `[${new Date(Date.now() - 7200000).toLocaleTimeString()}] Alert: Dispatch lead email dispatched to dispatch@allenelectric.co.`
+    ]);
+
+    // 1. Supabase Real-time postgres listener
+    let channel: any = null;
+    if (supabase) {
+      channel = supabase
+        .channel('db-leads-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, (payload: any) => {
+          const newLead = payload.new;
+          setEmailLogs((prev) => [
+            `[${new Date().toLocaleTimeString()}] Real-time DB Update: Lead "${newLead?.name || 'Unknown'}" was ${payload.eventType.toLowerCase()}d.`,
+            ...prev
+          ]);
+          loadLeads();
+        })
+        .subscribe();
     }
+
+    // 2. LocalStorage storage listener (for multi-tab real-time sync)
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'allen_electric_bookings') {
+        setEmailLogs((prev) => [
+          `[${new Date().toLocaleTimeString()}] Real-time Storage Sync: Detected update from another browser tab. Synchronizing...`,
+          ...prev
+        ]);
+        loadLeads();
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+
+    // 3. Custom same-tab event listener (instantly fires on form submits)
+    const handleCustomLead = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const newLead = customEvent.detail;
+      setEmailLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] Real-time App Notification: New website lead "${newLead?.name || 'Customer'}" received!`,
+        ...prev
+      ]);
+      loadLeads();
+    };
+    window.addEventListener('lead-added', handleCustomLead);
+
+    return () => {
+      if (channel && supabase) {
+        supabase.removeChannel(channel);
+      }
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('lead-added', handleCustomLead);
+    };
   }, [isLoggedIn]);
 
   const handleLogin = (e: React.FormEvent) => {
@@ -112,6 +165,22 @@ export const AdminDashboard: React.FC = () => {
       ]);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleDragStart = (e: React.DragEvent, leadId: string) => {
+    e.dataTransfer.setData('text/plain', leadId);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetStatus: string) => {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('text/plain');
+    if (id) {
+      await handleStatusUpdate(id, targetStatus);
     }
   };
 
@@ -213,50 +282,300 @@ export const AdminDashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto space-y-8">
           
           {/* Top Admin Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-center bg-brand-navy-900 text-white p-6 rounded-3xl shadow-xl gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-center bg-brand-navy-900 text-white p-6 rounded-3xl shadow-xl gap-4">
             <div className="flex items-center gap-3">
               <div className="bg-brand-gold-500 text-brand-navy-950 p-2.5 rounded-2xl">
-                <Settings className="w-6 h-6" />
+                <Settings className="w-6 h-6 animate-spin-slow" />
               </div>
               <div>
                 <h1 className="font-extrabold text-xl md:text-2xl font-display">
                   Lead Management Panel
                 </h1>
-                <p className="text-slate-400 text-xs">Logged in: admin &bull; Allen Electric Dispatcher</p>
+                <p className="text-slate-400 text-xs text-left">Logged in: admin &bull; Allen Electric Dispatcher</p>
               </div>
             </div>
 
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/5 py-2.5 px-5 rounded-xl text-xs font-bold transition-colors"
-            >
-              <LogOut className="w-4 h-4 text-brand-gold-400" />
-              <span>Sign Out</span>
-            </button>
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+              {/* View Mode Toggle */}
+              <div className="bg-white/5 rounded-2xl p-1 flex items-center border border-white/10 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('pipeline')}
+                  className={`flex-1 sm:flex-initial py-1.5 px-4 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                    viewMode === 'pipeline'
+                      ? 'bg-brand-gold-500 text-brand-navy-950 shadow-md shadow-brand-gold-500/10'
+                      : 'text-slate-300 hover:text-white'
+                  }`}
+                >
+                  Pipeline Board
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('list')}
+                  className={`flex-1 sm:flex-initial py-1.5 px-4 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                    viewMode === 'list'
+                      ? 'bg-brand-gold-500 text-brand-navy-950 shadow-md shadow-brand-gold-500/10'
+                      : 'text-slate-300 hover:text-white'
+                  }`}
+                >
+                  List Feed
+                </button>
+              </div>
+
+              <button
+                onClick={handleLogout}
+                className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/5 py-2.5 px-5 rounded-xl text-xs font-bold transition-colors w-full sm:w-auto"
+              >
+                <LogOut className="w-4 h-4 text-brand-gold-400" />
+                <span>Sign Out</span>
+              </button>
+            </div>
           </div>
 
-          {/* Grid Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
-            {/* Left Main leads tracking panel (lg:col-span-8) */}
-            <div className="lg:col-span-8 space-y-6">
+          {viewMode === 'list' ? (
+            /* ─── List Feed View Mode ─── */
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              
+              {/* Left Main leads tracking panel */}
+              <div className="lg:col-span-8 space-y-6">
+                
+                {/* Search & Filter bar */}
+                <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm flex flex-col md:flex-row justify-between gap-4 items-center">
+                  <div className="relative w-full md:w-80">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search by name, phone, service..."
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-xs focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex gap-2 w-full md:w-auto overflow-x-auto">
+                    {(['all', 'booking', 'quote', 'contact'] as const).map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => setFilterType(type)}
+                        className={`py-2 px-4 rounded-xl text-xs font-bold transition-all border whitespace-nowrap ${
+                          filterType === type
+                            ? 'bg-brand-navy-900 border-brand-navy-900 text-white'
+                            : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                        }`}
+                      >
+                        {type === 'all' && 'All Leads'}
+                        {type === 'booking' && 'Bookings'}
+                        {type === 'quote' && 'Quote Requests'}
+                        {type === 'contact' && 'Contacts'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Leads Feed List */}
+                <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1">
+                  {filteredLeads.length > 0 ? (
+                    filteredLeads.map((lead) => {
+                      const isSelected = selectedLead?.id === lead.id;
+                      return (
+                        <div
+                          key={lead.id}
+                          onClick={() => {
+                            setSelectedLead(lead);
+                            setEditingNotes(lead.notes || '');
+                          }}
+                          className={`bg-white rounded-3xl p-5 border transition-all cursor-pointer hover:border-slate-300 shadow-sm ${
+                            isSelected ? 'border-brand-gold-500 ring-2 ring-brand-gold-500/10' : 'border-slate-200'
+                          }`}
+                        >
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-extrabold text-brand-navy-900 text-sm">{lead.name}</h4>
+                                <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                                  lead.type === 'booking' ? 'bg-indigo-50 text-indigo-600' :
+                                  lead.type === 'quote' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-600'
+                                }`}>
+                                  {lead.type}
+                                </span>
+                              </div>
+                              <p className="text-[10px] text-slate-400 mt-1">Submitted: {new Date(lead.createdAt).toLocaleDateString()}</p>
+                            </div>
+
+                            <span className={`text-[10px] font-bold uppercase px-3 py-1 rounded-full ${
+                              lead.status === 'New' ? 'bg-red-50 text-red-600' :
+                              lead.status === 'Contacted' ? 'bg-blue-50 text-blue-600' :
+                              lead.status === 'Scheduled' ? 'bg-emerald-50 text-emerald-600' :
+                              lead.status === 'Completed' ? 'bg-slate-100 text-slate-600' :
+                              'bg-red-100 text-red-800'
+                            }`}>
+                              {lead.status}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs text-slate-600 mb-3 bg-slate-50 p-3 rounded-xl">
+                            <div className="flex items-center gap-1.5">
+                              <Tag className="w-3.5 h-3.5 text-slate-400" />
+                              <span className="font-bold text-slate-800">{lead.service}</span>
+                            </div>
+                            {lead.date && (
+                              <div className="flex items-center gap-1.5">
+                                <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                                <span>{lead.date} &bull; {lead.time}</span>
+                              </div>
+                            )}
+                            <div className="flex items-center gap-1.5">
+                              <Phone className="w-3.5 h-3.5 text-slate-400" />
+                              <span>{lead.phone}</span>
+                            </div>
+                          </div>
+
+                          <p className="text-slate-500 text-xs line-clamp-2 italic">"{lead.details}"</p>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center text-slate-400">
+                      <Users className="w-10 h-10 mx-auto mb-2 text-slate-300" />
+                      <p className="text-sm">No customer leads found matching filters.</p>
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+              {/* Right details sidebar */}
+              <div className="lg:col-span-4 space-y-6">
+                
+                {/* Selected Lead details sheet */}
+                <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm min-h-[350px]">
+                  {selectedLead ? (
+                    <div className="space-y-5">
+                      <div className="border-b border-slate-100 pb-4">
+                        <h3 className="font-extrabold text-lg font-display text-brand-navy-900">Lead Detail Card</h3>
+                        <p className="text-xs text-slate-400 mt-1">Manage statuses and dispatcher notes</p>
+                      </div>
+
+                      <div className="space-y-3 text-xs text-slate-600">
+                        <div className="flex items-center gap-2">
+                          <User className="w-4 h-4 text-slate-400" />
+                          <span className="font-bold text-slate-800">{selectedLead.name}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Phone className="w-4 h-4 text-slate-400" />
+                          <span>{selectedLead.phone}</span>
+                        </div>
+                        {selectedLead.email && (
+                          <div className="flex items-center gap-2">
+                            <Mail className="w-4 h-4 text-slate-400" />
+                            <span>{selectedLead.email}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2">
+                          <Zap className="w-4 h-4 text-slate-400" />
+                          <span className="font-bold text-brand-navy-900">{selectedLead.service}</span>
+                        </div>
+                      </div>
+
+                      {/* Status updates selectors */}
+                      <div>
+                        <label className="block text-[10px] uppercase font-bold text-slate-400 mb-2">Change Status</label>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {['New', 'Contacted', 'Scheduled', 'Completed'].map((s) => (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={() => handleStatusUpdate(selectedLead.id, s)}
+                              className={`py-1.5 px-2 rounded-xl text-[10px] font-bold text-center border transition-all ${
+                                selectedLead.status === s
+                                  ? 'bg-brand-navy-900 border-brand-navy-900 text-white'
+                                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                              }`}
+                            >
+                              {s}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Photo preview */}
+                      {selectedLead.photoUrl && (
+                        <div className="border border-slate-200 rounded-2xl overflow-hidden p-2 bg-slate-50">
+                          <p className="text-[9px] uppercase font-bold text-slate-400 mb-1.5">Job Image Attached:</p>
+                          <img 
+                            src={selectedLead.photoUrl} 
+                            alt="Job attachment" 
+                            className="w-full h-32 object-cover rounded-xl shadow-inner cursor-zoom-in"
+                            onClick={() => window.open(selectedLead.photoUrl)}
+                          />
+                        </div>
+                      )}
+
+                      {/* Dispatch Notes Logger */}
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <label className="block text-[10px] uppercase font-bold text-slate-400">Dispatcher Notes</label>
+                          {updateSuccess && (
+                            <span className="text-[9px] text-emerald-600 font-bold">Saved!</span>
+                          )}
+                        </div>
+                        <textarea
+                          value={editingNotes}
+                          onChange={(e) => setEditingNotes(e.target.value)}
+                          placeholder="Add scheduling notes or discount approvals..."
+                          rows={3}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
+                        ></textarea>
+                        <button
+                          onClick={() => handleSaveNotes(selectedLead.id)}
+                          className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-xl text-[10px] uppercase tracking-wide mt-2 transition-all"
+                        >
+                          Save Dispatch Notes
+                        </button>
+                      </div>
+
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-center text-slate-400 py-12 h-full">
+                      <FileText className="w-10 h-10 text-slate-300 mb-2 animate-pulse" />
+                      <p className="text-xs">Select a customer lead from the list to display details and edit dispatcher notes.</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Mock Email Alert Logs Console */}
+                <div className="bg-brand-navy-900 border border-white/5 rounded-3xl p-5 text-white shadow-xl text-left">
+                  <h4 className="font-extrabold text-sm font-display mb-3 flex items-center gap-1.5 text-brand-gold-400">
+                    <MailWarning className="w-4 h-4 text-left" />
+                    Dispatcher Notifications
+                  </h4>
+                  <div className="bg-black/35 rounded-2xl p-4 font-mono text-[9px] text-emerald-400/90 h-[150px] overflow-y-auto space-y-2.5 text-left">
+                    {emailLogs.map((log, idx) => (
+                      <div key={idx} className="leading-relaxed">{log}</div>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          ) : (
+            /* ─── Kanban Pipeline Board View Mode ─── */
+            <div className="space-y-6">
               
               {/* Search & Filter bar */}
               <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm flex flex-col md:flex-row justify-between gap-4 items-center">
-                
-                {/* Search */}
                 <div className="relative w-full md:w-80">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search by name, phone, service..."
+                    placeholder="Filter pipeline by name, phone..."
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-xs focus:outline-none"
                   />
                 </div>
 
-                {/* Filters */}
                 <div className="flex gap-2 w-full md:w-auto overflow-x-auto">
                   {(['all', 'booking', 'quote', 'contact'] as const).map((type) => (
                     <button
@@ -268,204 +587,252 @@ export const AdminDashboard: React.FC = () => {
                           : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
                       }`}
                     >
-                      {type === 'all' && 'All Leads'}
-                      {type === 'booking' && 'Bookings'}
-                      {type === 'quote' && 'Quote Requests'}
-                      {type === 'contact' && 'Contacts'}
+                      {type === 'all' && 'All Types'}
+                      {type === 'booking' && 'Bookings Only'}
+                      {type === 'quote' && 'Quotes Only'}
+                      {type === 'contact' && 'Contacts Only'}
                     </button>
                   ))}
                 </div>
-
               </div>
 
-              {/* Leads Feed List */}
-              <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1">
-                {filteredLeads.length > 0 ? (
-                  filteredLeads.map((lead) => {
-                    const isSelected = selectedLead?.id === lead.id;
-                    return (
-                      <div
-                        key={lead.id}
-                        onClick={() => {
-                          setSelectedLead(lead);
-                          setEditingNotes(lead.notes || '');
-                        }}
-                        className={`bg-white rounded-3xl p-5 border transition-all cursor-pointer hover:border-slate-300 shadow-sm ${
-                          isSelected ? 'border-brand-gold-500 ring-2 ring-brand-gold-500/10' : 'border-slate-200'
-                        }`}
-                      >
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-extrabold text-brand-navy-900 text-sm">{lead.name}</h4>
-                              <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                                lead.type === 'booking' ? 'bg-indigo-50 text-indigo-600' :
-                                lead.type === 'quote' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-600'
-                              }`}>
-                                {lead.type}
-                              </span>
+              {/* Kanban columns grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {(['New', 'Contacted', 'Scheduled', 'Completed'] as const).map((colStatus) => {
+                  const colLeads = filteredLeads.filter((l) => l.status === colStatus);
+                  return (
+                    <div
+                      key={colStatus}
+                      onDragOver={handleDragOver}
+                      onDrop={(e) => handleDrop(e, colStatus)}
+                      className="bg-slate-100/90 border border-slate-200/50 rounded-3xl p-4 flex flex-col min-h-[500px] shadow-inner text-left"
+                    >
+                      {/* Column Header */}
+                      <div className="flex justify-between items-center mb-4 pb-2 border-b border-slate-200/60">
+                        <h3 className="font-extrabold text-xs text-brand-navy-900 uppercase tracking-widest flex items-center gap-2">
+                          <span className={`w-2.5 h-2.5 rounded-full ${
+                            colStatus === 'New' ? 'bg-red-500' :
+                            colStatus === 'Contacted' ? 'bg-blue-500 animate-pulse' :
+                            colStatus === 'Scheduled' ? 'bg-emerald-500' : 'bg-slate-400'
+                          }`} />
+                          {colStatus === 'New' ? 'New Leads' : colStatus}
+                        </h3>
+                        <span className="text-[10px] bg-slate-250 text-brand-navy-950 font-bold px-2.5 py-0.5 rounded-full border border-slate-300/40">
+                          {colLeads.length}
+                        </span>
+                      </div>
+
+                      {/* Cards Container */}
+                      <div className="flex-1 space-y-3 overflow-y-auto max-h-[480px] pr-1">
+                        {colLeads.length > 0 ? (
+                          colLeads.map((lead) => (
+                            <div
+                              key={lead.id}
+                              draggable
+                              onDragStart={(e) => handleDragStart(e, lead.id)}
+                              onClick={() => {
+                                setSelectedLead(lead);
+                                setEditingNotes(lead.notes || '');
+                              }}
+                              className="bg-white border border-slate-200/70 hover:border-brand-gold-500 hover:ring-2 hover:ring-brand-gold-500/10 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing group relative space-y-2"
+                            >
+                              <div className="flex justify-between items-start gap-2">
+                                <h4 className="font-extrabold text-brand-navy-900 text-xs line-clamp-1">{lead.name}</h4>
+                                <span className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full flex-shrink-0 ${
+                                  lead.type === 'booking' ? 'bg-indigo-50 text-indigo-600' :
+                                  lead.type === 'quote' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-600'
+                                }`}>
+                                  {lead.type}
+                                </span>
+                              </div>
+
+                              <p className="text-[9px] text-slate-400">
+                                Date: {new Date(lead.createdAt).toLocaleDateString()}
+                              </p>
+
+                              <div className="text-[10px] text-slate-600 bg-slate-50 p-2.5 rounded-xl space-y-1">
+                                <p className="font-bold text-slate-800 line-clamp-1">{lead.service}</p>
+                                <p className="line-clamp-1 font-mono">{lead.phone}</p>
+                              </div>
+
+                              <p className="text-[10px] text-slate-500 italic line-clamp-2">
+                                "{lead.details || 'No additional details.'}"
+                              </p>
+
+                              {/* Drag Hint & Quick Pipeline Transition Actions */}
+                              <div className="pt-2 border-t border-slate-100 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span className="text-[8px] text-slate-400">Drag card or click</span>
+                                <div className="flex gap-0.5">
+                                  {colStatus !== 'New' && (
+                                    <button
+                                      type="button"
+                                      title="Move Left"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        const prevStatus = colStatus === 'Contacted' ? 'New' : colStatus === 'Scheduled' ? 'Contacted' : 'Scheduled';
+                                        handleStatusUpdate(lead.id, prevStatus);
+                                      }}
+                                      className="p-1 hover:bg-slate-100 rounded text-slate-600 font-extrabold text-xs transition-colors"
+                                    >
+                                      &larr;
+                                    </button>
+                                  )}
+                                  {colStatus !== 'Completed' && (
+                                    <button
+                                      type="button"
+                                      title="Move Right"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        const nextStatus = colStatus === 'New' ? 'Contacted' : colStatus === 'Contacted' ? 'Scheduled' : 'Completed';
+                                        handleStatusUpdate(lead.id, nextStatus);
+                                      }}
+                                      className="p-1 hover:bg-slate-100 rounded text-slate-600 font-extrabold text-xs transition-colors"
+                                    >
+                                      &rarr;
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                            <p className="text-[10px] text-slate-400 mt-1">Submitted: {new Date(lead.createdAt).toLocaleDateString()}</p>
+                          ))
+                        ) : (
+                          <div className="py-16 text-center text-slate-400 text-xs border border-dashed border-slate-200 rounded-2xl h-full flex flex-col justify-center">
+                            No Leads in Status
                           </div>
-
-                          {/* Lead status badge */}
-                          <span className={`text-[10px] font-bold uppercase px-3 py-1 rounded-full ${
-                            lead.status === 'New' ? 'bg-red-50 text-red-600' :
-                            lead.status === 'Contacted' ? 'bg-blue-50 text-blue-600' :
-                            lead.status === 'Scheduled' ? 'bg-emerald-50 text-emerald-600' :
-                            lead.status === 'Completed' ? 'bg-slate-100 text-slate-600' :
-                            'bg-red-100 text-red-800'
-                          }`}>
-                            {lead.status}
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs text-slate-600 mb-3 bg-slate-50 p-3 rounded-xl">
-                          <div className="flex items-center gap-1.5">
-                            <Tag className="w-3.5 h-3.5 text-slate-400" />
-                            <span className="font-bold text-slate-800">{lead.service}</span>
-                          </div>
-                          {lead.date && (
-                            <div className="flex items-center gap-1.5">
-                              <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                              <span>{lead.date} &bull; {lead.time}</span>
-                            </div>
-                          )}
-                          <div className="flex items-center gap-1.5">
-                            <Phone className="w-3.5 h-3.5 text-slate-400" />
-                            <span>{lead.phone}</span>
-                          </div>
-                        </div>
-
-                        <p className="text-slate-500 text-xs line-clamp-2 italic">"{lead.details}"</p>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center text-slate-400">
-                    <Users className="w-10 h-10 mx-auto mb-2 text-slate-300" />
-                    <p className="text-sm">No customer leads found matching filters.</p>
-                  </div>
-                )}
-              </div>
-
-            </div>
-
-            {/* Right details sidebar (lg:col-span-4) */}
-            <div className="lg:col-span-4 space-y-6">
-              
-              {/* Selected Lead details sheet */}
-              <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm min-h-[350px]">
-                {selectedLead ? (
-                  <div className="space-y-5">
-                    <div className="border-b border-slate-100 pb-4">
-                      <h3 className="font-extrabold text-lg font-display text-brand-navy-900">Lead Detail Card</h3>
-                      <p className="text-xs text-slate-400 mt-1">Manage statuses and dispatcher notes</p>
-                    </div>
-
-                    <div className="space-y-3 text-xs text-slate-600">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-slate-400" />
-                        <span className="font-bold text-slate-800">{selectedLead.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Phone className="w-4 h-4 text-slate-400" />
-                        <span>{selectedLead.phone}</span>
-                      </div>
-                      {selectedLead.email && (
-                        <div className="flex items-center gap-2">
-                          <Mail className="w-4 h-4 text-slate-400" />
-                          <span>{selectedLead.email}</span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-slate-400" />
-                        <span className="font-bold text-brand-navy-900">{selectedLead.service}</span>
-                      </div>
-                    </div>
-
-                    {/* Status updates selectors */}
-                    <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-2">Change Status</label>
-                      <div className="grid grid-cols-2 gap-1.5">
-                        {['New', 'Contacted', 'Scheduled', 'Completed'].map((s) => (
-                          <button
-                            key={s}
-                            type="button"
-                            onClick={() => handleStatusUpdate(selectedLead.id, s)}
-                            className={`py-1.5 px-2 rounded-xl text-[10px] font-bold text-center border transition-all ${
-                              selectedLead.status === s
-                                ? 'bg-brand-navy-900 border-brand-navy-900 text-white'
-                                : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                            }`}
-                          >
-                            {s}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Photo preview (if upload exists) */}
-                    {selectedLead.photoUrl && (
-                      <div className="border border-slate-200 rounded-2xl overflow-hidden p-2 bg-slate-50">
-                        <p className="text-[9px] uppercase font-bold text-slate-400 mb-1.5">Job Image Attached:</p>
-                        <img 
-                          src={selectedLead.photoUrl} 
-                          alt="Job attachment" 
-                          className="w-full h-32 object-cover rounded-xl shadow-inner cursor-zoom-in"
-                          onClick={() => window.open(selectedLead.photoUrl)}
-                        />
-                      </div>
-                    )}
-
-                    {/* Dispatch Notes Logger */}
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <label className="block text-[10px] uppercase font-bold text-slate-400">Dispatcher Notes</label>
-                        {updateSuccess && (
-                          <span className="text-[9px] text-emerald-600 font-bold">Saved!</span>
                         )}
                       </div>
-                      <textarea
-                        value={editingNotes}
-                        onChange={(e) => setEditingNotes(e.target.value)}
-                        placeholder="Add scheduling notes or discount approvals..."
-                        rows={3}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
-                      ></textarea>
-                      <button
-                        onClick={() => handleSaveNotes(selectedLead.id)}
-                        className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-xl text-[10px] uppercase tracking-wide mt-2 transition-all"
-                      >
-                        Save Dispatch Notes
-                      </button>
                     </div>
-
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-center text-slate-400 py-12 h-full">
-                    <FileText className="w-10 h-10 text-slate-300 mb-2 animate-pulse" />
-                    <p className="text-xs">Select a customer lead from the list to display details and edit dispatcher notes.</p>
-                  </div>
-                )}
+                  );
+                })}
               </div>
 
-              {/* Mock Email Alert Logs Console */}
-              <div className="bg-brand-navy-900 border border-white/5 rounded-3xl p-5 text-white shadow-xl">
-                <h4 className="font-extrabold text-sm font-display mb-3 flex items-center gap-1.5 text-brand-gold-400">
-                  <MailWarning className="w-4 h-4" />
-                  Dispatcher Notifications
-                </h4>
-                <div className="bg-black/35 rounded-2xl p-4 font-mono text-[9px] text-emerald-400/90 h-[150px] overflow-y-auto space-y-2.5">
-                  {emailLogs.map((log, idx) => (
-                    <div key={idx} className="leading-relaxed">{log}</div>
-                  ))}
+              {/* Real-time Logger and Actions side-by-side below Kanban columns */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pt-4">
+                <div className="md:col-span-6">
+                  {/* Mock Email Alert Logs Console */}
+                  <div className="bg-brand-navy-900 border border-white/5 rounded-3xl p-5 text-white shadow-xl text-left h-full">
+                    <h4 className="font-extrabold text-sm font-display mb-3 flex items-center gap-1.5 text-brand-gold-400">
+                      <MailWarning className="w-4 h-4" />
+                      Live Dispatch Notifications
+                    </h4>
+                    <div className="bg-black/35 rounded-2xl p-4 font-mono text-[9px] text-emerald-400/90 h-[150px] overflow-y-auto space-y-2.5">
+                      {emailLogs.map((log, idx) => (
+                        <div key={idx} className="leading-relaxed">{log}</div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="md:col-span-6 flex flex-col justify-center bg-white border border-slate-200 rounded-3xl p-6 shadow-sm text-center">
+                  <FileText className="w-8 h-8 text-brand-gold-500 mx-auto mb-2 animate-bounce" />
+                  <h4 className="font-extrabold text-slate-800 text-sm">Real-time Pipeline sync active</h4>
+                  <p className="text-slate-400 text-xs mt-1">
+                    Forms completed anywhere on the site populate this board instantly. Try dropping cards to update dispatcher statuses.
+                  </p>
                 </div>
               </div>
 
             </div>
+          )}
 
-          </div>
+          {/* Modal for Lead Details in Pipeline Mode */}
+          {selectedLead && viewMode === 'pipeline' && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-brand-navy-950/65 backdrop-blur-sm p-4">
+              <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl max-w-md w-full relative text-left">
+                <button
+                  onClick={() => setSelectedLead(null)}
+                  className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 focus:outline-none bg-slate-100 hover:bg-slate-200 p-1.5 rounded-full transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                
+                <div className="space-y-5">
+                  <div className="border-b border-slate-100 pb-3">
+                    <h3 className="font-extrabold text-lg font-display text-brand-navy-900">Lead Detail Card</h3>
+                    <p className="text-xs text-slate-400 mt-0.5">Manage statuses and notes</p>
+                  </div>
+
+                  <div className="space-y-3 text-xs text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-slate-400" />
+                      <span className="font-bold text-slate-800">{selectedLead.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4 text-slate-400" />
+                      <span className="font-mono">{selectedLead.phone}</span>
+                    </div>
+                    {selectedLead.email && (
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-slate-400" />
+                        <span>{selectedLead.email}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-slate-400" />
+                      <span className="font-bold text-brand-navy-900">{selectedLead.service}</span>
+                    </div>
+                  </div>
+
+                  {/* Status updates selectors */}
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-2">Change Status</label>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {['New', 'Contacted', 'Scheduled', 'Completed'].map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => handleStatusUpdate(selectedLead.id, s)}
+                          className={`py-1.5 px-2 rounded-xl text-[10px] font-bold text-center border transition-all ${
+                            selectedLead.status === s
+                              ? 'bg-brand-navy-900 border-brand-navy-900 text-white shadow-sm'
+                              : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                          }`}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Photo preview */}
+                  {selectedLead.photoUrl && (
+                    <div className="border border-slate-200 rounded-2xl overflow-hidden p-2 bg-slate-50">
+                      <p className="text-[9px] uppercase font-bold text-slate-400 mb-1.5">Job Image Attached:</p>
+                      <img 
+                        src={selectedLead.photoUrl} 
+                        alt="Job attachment" 
+                        className="w-full h-32 object-cover rounded-xl shadow-inner cursor-zoom-in"
+                        onClick={() => window.open(selectedLead.photoUrl)}
+                      />
+                    </div>
+                  )}
+
+                  {/* Dispatch Notes Logger */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="block text-[10px] uppercase font-bold text-slate-400">Dispatcher Notes</label>
+                      {updateSuccess && (
+                        <span className="text-[9px] text-emerald-600 font-bold">Saved!</span>
+                      )}
+                    </div>
+                    <textarea
+                      value={editingNotes}
+                      onChange={(e) => setEditingNotes(e.target.value)}
+                      placeholder="Add scheduling notes or discount approvals..."
+                      rows={3}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
+                    ></textarea>
+                    <button
+                      onClick={() => handleSaveNotes(selectedLead.id)}
+                      className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-xl text-[10px] uppercase tracking-wide mt-2 transition-all border border-slate-200/50"
+                    >
+                      Save Dispatch Notes
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Bottom Calendar agenda list */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">

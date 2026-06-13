@@ -78,7 +78,7 @@ export const Footer: React.FC = () => {
           <div className="flex flex-wrap gap-3">
             <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg py-1 px-2.5 text-[11px] font-semibold text-slate-300">
               <ShieldCheck className="w-3.5 h-3.5 text-brand-gold-400" />
-              <span>Licensed AL #49281</span>
+              <span>State Licensed</span>
             </div>
             <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg py-1 px-2.5 text-[11px] font-semibold text-slate-300">
               <Award className="w-3.5 h-3.5 text-brand-gold-400" />
@@ -157,7 +157,7 @@ export const Footer: React.FC = () => {
       <div className="bg-brand-navy-950 py-8 px-4 md:px-8 border-t border-white/5 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex flex-col gap-1 text-center md:text-left">
-            <p>&copy; {currentYear} Allen Electric LLC. All Rights Reserved. Licensed Contractor ID: #AL-49281.</p>
+            <p>&copy; {currentYear} Allen Electric LLC. All Rights Reserved. Fully Licensed, Bonded, & Insured.</p>
             <p>Licensed, Insured, & Bonded for Residential & Commercial electrical installations in the state of Alabama.</p>
           </div>
           <div className="flex items-center gap-6">

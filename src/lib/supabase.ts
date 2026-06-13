@@ -181,12 +181,20 @@ export const dbService = {
         .from('leads')
         .insert([newLead])
         .select();
-      if (!error && data) return data[0];
+      if (!error && data) {
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('lead-added', { detail: data[0] }));
+        }
+        return data[0];
+      }
     }
 
     const current = await this.getLeads();
     const updated = [newLead, ...current];
     localStorage.setItem(STORAGE_KEYS.BOOKINGS, JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('lead-added', { detail: newLead }));
+    }
     return newLead;
   },
 

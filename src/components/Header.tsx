@@ -102,9 +102,6 @@ export const Header: React.FC = () => {
                 <span className="font-extrabold text-base sm:text-xl tracking-tight text-white font-display">
                   ALLEN <span className="text-brand-gold-400">ELECTRIC</span>
                 </span>
-                <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest font-semibold mt-0.5">
-                  Alabama Licensed Contractors
-                </span>
               </div>
             </Link>
 

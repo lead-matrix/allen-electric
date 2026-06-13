@@ -4,6 +4,7 @@ import { servicesData } from '../data/services';
 import { initialReviews } from '../data/reviews';
 import { BeforeAfterGallery } from '../components/BeforeAfterGallery';
 import { InteractiveMap } from '../components/InteractiveMap';
+import { dbService } from '../lib/supabase';
 import { 
   Zap, 
   Phone, 
@@ -24,6 +25,37 @@ import { Helmet } from 'react-helmet-async';
 export const Home: React.FC = () => {
   // Testimonial Carousel state
   const [activeReviewIndex, setActiveReviewIndex] = useState(0);
+
+  // Estimate Form State
+  const [estimateName, setEstimateName] = useState('');
+  const [estimatePhone, setEstimatePhone] = useState('');
+  const [estimateService, setEstimateService] = useState('Panel Upgrades');
+  const [isEstimateSubmitting, setIsEstimateSubmitting] = useState(false);
+  const [isEstimateSuccess, setIsEstimateSuccess] = useState(false);
+
+  const handleEstimateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!estimateName.trim() || !estimatePhone.trim()) return;
+
+    setIsEstimateSubmitting(true);
+    try {
+      await dbService.addLead({
+        name: estimateName,
+        phone: estimatePhone,
+        email: '',
+        service: estimateService,
+        details: 'Submitted Request Free Estimate form from Home page hero section.',
+        type: 'quote'
+      });
+      setIsEstimateSubmitting(false);
+      setIsEstimateSuccess(true);
+      setEstimateName('');
+      setEstimatePhone('');
+    } catch (err) {
+      console.error(err);
+      setIsEstimateSubmitting(false);
+    }
+  };
 
   const handleNextReview = () => {
     setActiveReviewIndex((prev) => (prev + 1) % initialReviews.length);
@@ -191,45 +223,72 @@ export const Home: React.FC = () => {
             <p className="text-slate-400 text-xs mb-6">
               Fill in your details below and a certified technician will call you in minutes.
             </p>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              alert("Estimate request submitted! A technician will call you shortly.");
-            }} className="space-y-4">
-              <div>
-                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Your Name</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Enter full name"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-gold-500 placeholder-slate-600"
-                />
+            {isEstimateSuccess ? (
+              <div className="text-center py-8 space-y-4">
+                <div className="bg-emerald-500/10 text-emerald-400 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto border border-emerald-500/20">
+                  <CheckCircle className="w-8 h-8" />
+                </div>
+                <h4 className="font-extrabold text-white text-lg font-display">Estimate Request Sent!</h4>
+                <p className="text-slate-300 text-xs leading-relaxed">
+                  Thank you. A certified technician has been dispatched and will call you at <span className="text-brand-gold-400 font-bold">{estimatePhone}</span> in a few minutes.
+                </p>
+                <button
+                  onClick={() => {
+                    setIsEstimateSuccess(false);
+                    setEstimatePhone('');
+                  }}
+                  className="text-xs text-brand-gold-400 font-bold hover:underline mt-4"
+                >
+                  Submit Another Request
+                </button>
               </div>
-              <div>
-                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Phone Number</label>
-                <input
-                  type="tel"
-                  required
-                  placeholder="+1 (205) 555-0100"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-gold-500 placeholder-slate-600"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Needed Service</label>
-                <select className="w-full bg-brand-navy-900 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-gold-500">
-                  <option value="Panel Upgrades">Panel Upgrade</option>
-                  <option value="Generator Installation">Generator Installation</option>
-                  <option value="Electrical Repairs">Electrical Repair</option>
-                  <option value="Lighting Installation">Lighting Installation</option>
-                  <option value="Other">Other Service</option>
-                </select>
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-brand-gold-500 hover:bg-brand-gold-400 text-brand-navy-950 font-black py-3 rounded-xl text-xs uppercase tracking-wider transition-all"
-              >
-                Send Request
-              </button>
-            </form>
+            ) : (
+              <form onSubmit={handleEstimateSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Your Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={estimateName}
+                    onChange={(e) => setEstimateName(e.target.value)}
+                    placeholder="Enter full name"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-gold-500 placeholder-slate-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Phone Number</label>
+                  <input
+                    type="tel"
+                    required
+                    value={estimatePhone}
+                    onChange={(e) => setEstimatePhone(e.target.value)}
+                    placeholder="+1 (205) 555-0100"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-gold-500 placeholder-slate-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Needed Service</label>
+                  <select 
+                    value={estimateService}
+                    onChange={(e) => setEstimateService(e.target.value)}
+                    className="w-full bg-brand-navy-900 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-gold-500"
+                  >
+                    <option value="Panel Upgrades">Panel Upgrade</option>
+                    <option value="Generator Installation">Generator Installation</option>
+                    <option value="Electrical Repairs">Electrical Repair</option>
+                    <option value="Lighting Installation">Lighting Installation</option>
+                    <option value="Other">Other Service</option>
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  disabled={isEstimateSubmitting}
+                  className="w-full bg-brand-gold-500 hover:bg-brand-gold-400 text-brand-navy-950 font-black py-3 rounded-xl text-xs uppercase tracking-wider transition-all disabled:opacity-50"
+                >
+                  {isEstimateSubmitting ? 'Sending Request...' : 'Send Request'}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </section>

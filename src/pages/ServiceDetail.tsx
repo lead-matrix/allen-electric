@@ -177,8 +177,8 @@ export const ServiceDetail: React.FC = () => {
               <h4 className="font-extrabold text-brand-navy-900 text-sm mb-3">Dispatch Availability</h4>
               <div className="space-y-3">
                 <div className="flex justify-between border-b border-slate-200/50 pb-2">
-                  <span>Alabama License:</span>
-                  <span className="font-bold text-brand-navy-900">#AL-49281</span>
+                  <span>Licensure Status:</span>
+                  <span className="font-bold text-brand-navy-900">Licensed & Insured</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-200/50 pb-2">
                   <span>Warranty:</span>
