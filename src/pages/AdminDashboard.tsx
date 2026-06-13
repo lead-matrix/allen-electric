@@ -14,7 +14,11 @@ import {
   Mail,
   Zap,
   Tag,
-  X
+  X,
+  Star,
+  MessageSquare,
+  Trash2,
+  Plus
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
@@ -36,8 +40,19 @@ export const AdminDashboard: React.FC = () => {
   // Email notifications mock logs
   const [emailLogs, setEmailLogs] = useState<string[]>([]);
 
-  // View mode toggle: list view or Kanban pipeline board
-  const [viewMode, setViewMode] = useState<'list' | 'pipeline'>('pipeline');
+  // View mode toggle: list view, Kanban pipeline board, or Reviews manager
+  const [viewMode, setViewMode] = useState<'list' | 'pipeline' | 'reviews'>('pipeline');
+
+  // Reviews management state
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [showAddReviewModal, setShowAddReviewModal] = useState(false);
+  const [newReviewName, setNewReviewName] = useState('');
+  const [newReviewLocation, setNewReviewLocation] = useState('');
+  const [newReviewRating, setNewReviewRating] = useState(5);
+  const [newReviewService, setNewReviewService] = useState('Panel Upgrade');
+  const [newReviewText, setNewReviewText] = useState('');
+  const [reviewSubmitSuccess, setReviewSubmitSuccess] = useState(false);
+  const [reviewSubmitError, setReviewSubmitError] = useState('');
 
   const loadLeads = async () => {
     try {
@@ -48,10 +63,20 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  const loadReviews = async () => {
+    try {
+      const data = await dbService.getReviews();
+      setReviews(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     if (!isLoggedIn) return;
 
     loadLeads();
+    loadReviews();
 
     // Add initial mock email logs
     setEmailLogs([
@@ -84,6 +109,12 @@ export const AdminDashboard: React.FC = () => {
           ...prev
         ]);
         loadLeads();
+      } else if (e.key === 'allen_electric_reviews') {
+        setEmailLogs((prev) => [
+          `[${new Date().toLocaleTimeString()}] Real-time Storage Sync: Reviews updated from another browser tab. Syncing...`,
+          ...prev
+        ]);
+        loadReviews();
       }
     };
     window.addEventListener('storage', handleStorage);
@@ -165,6 +196,58 @@ export const AdminDashboard: React.FC = () => {
       ]);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleDeleteReview = async (id: string) => {
+    try {
+      await dbService.deleteReview(id);
+      await loadReviews();
+      setEmailLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] Status: Review ID #${id} deleted by Administrator.`,
+        ...prev
+      ]);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleAddReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newReviewName.trim() || !newReviewText.trim() || !newReviewLocation.trim()) return;
+
+    try {
+      await dbService.addReview({
+        name: newReviewName,
+        location: newReviewLocation,
+        rating: newReviewRating,
+        text: newReviewText,
+        service: newReviewService
+      });
+
+      setReviewSubmitSuccess(true);
+      setReviewSubmitError('');
+      
+      // Reset form
+      setNewReviewName('');
+      setNewReviewLocation('');
+      setNewReviewRating(5);
+      setNewReviewText('');
+      setNewReviewService('Panel Upgrade');
+
+      await loadReviews();
+
+      setTimeout(() => {
+        setReviewSubmitSuccess(false);
+        setShowAddReviewModal(false);
+      }, 1500);
+
+      setEmailLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] Status: Admin added custom review.`,
+        ...prev
+      ]);
+    } catch (err: any) {
+      setReviewSubmitError(err.message || 'Error creating review.');
     }
   };
 
@@ -319,6 +402,17 @@ export const AdminDashboard: React.FC = () => {
                   }`}
                 >
                   List Feed
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('reviews')}
+                  className={`flex-1 sm:flex-initial py-1.5 px-4 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                    viewMode === 'reviews'
+                      ? 'bg-brand-gold-500 text-brand-navy-950 shadow-md shadow-brand-gold-500/10'
+                      : 'text-slate-300 hover:text-white'
+                  }`}
+                >
+                  Reviews Control
                 </button>
               </div>
 
@@ -559,7 +653,7 @@ export const AdminDashboard: React.FC = () => {
               </div>
 
             </div>
-          ) : (
+          ) : viewMode === 'pipeline' ? (
             /* ─── Kanban Pipeline Board View Mode ─── */
             <div className="space-y-6">
               
@@ -732,6 +826,209 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
 
+            </div>
+          ) : (
+            /* ─── Reviews Control View Mode ─── */
+            <div className="space-y-6">
+              {/* Header and Actions */}
+              <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="text-left w-full">
+                  <h3 className="font-extrabold text-lg font-display text-brand-navy-900 flex items-center gap-2">
+                    <MessageSquare className="w-5 h-5 text-brand-gold-500" />
+                    Customer Reviews Moderation
+                  </h3>
+                  <p className="text-slate-400 text-xs mt-1">
+                    Manage client reviews showing up on the website. Delete spam or add offline entries.
+                  </p>
+                </div>
+                
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReviewSubmitSuccess(false);
+                    setReviewSubmitError('');
+                    setShowAddReviewModal(true);
+                  }}
+                  className="bg-brand-navy-900 hover:bg-brand-navy-950 text-white font-bold py-2.5 px-5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md hover:shadow-lg shrink-0 w-full sm:w-auto justify-center"
+                >
+                  <Plus className="w-4 h-4 text-brand-gold-400" />
+                  <span>Add Review</span>
+                </button>
+              </div>
+
+              {/* Reviews Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {reviews.length > 0 ? (
+                  reviews.map((rev) => (
+                    <div
+                      key={rev.id}
+                      className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow relative flex flex-col justify-between text-left"
+                    >
+                      {/* Delete Button */}
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteReview(rev.id)}
+                        className="absolute top-4 right-4 text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-xl transition-colors"
+                        title="Delete Review"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+
+                      <div className="space-y-4">
+                        {/* Header info */}
+                        <div className="pr-8">
+                          <h4 className="font-extrabold text-brand-navy-900 text-sm font-display">{rev.name}</h4>
+                          <p className="text-[10px] text-slate-400 mt-0.5">
+                            {rev.location} &bull; {rev.service}
+                          </p>
+                        </div>
+
+                        {/* Rating stars */}
+                        <div className="flex gap-0.5 text-brand-gold-500">
+                          {[...Array(rev.rating)].map((_, i) => (
+                            <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                          ))}
+                          {[...Array(5 - rev.rating)].map((_, i) => (
+                            <Star key={i} className="w-3.5 h-3.5 text-slate-200" />
+                          ))}
+                        </div>
+
+                        {/* Review text */}
+                        <p className="text-slate-655 text-xs leading-relaxed italic text-slate-600">
+                          "{rev.text}"
+                        </p>
+                      </div>
+
+                      {/* Footer date */}
+                      <div className="pt-4 mt-4 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400">
+                        <span>Date: {rev.date}</span>
+                        <span className="font-semibold text-brand-gold-600 bg-brand-gold-50/50 px-2 py-0.5 rounded-full border border-brand-gold-100">
+                          Published
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-full bg-white border border-slate-200 rounded-3xl p-12 text-center text-slate-400">
+                    <MessageSquare className="w-10 h-10 mx-auto mb-2 text-slate-300" />
+                    <p className="text-sm">No reviews found.</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Add Review Modal */}
+              {showAddReviewModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-brand-navy-950/65 backdrop-blur-sm p-4">
+                  <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl max-w-md w-full relative text-left">
+                    <button
+                      onClick={() => setShowAddReviewModal(false)}
+                      className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 focus:outline-none bg-slate-100 hover:bg-slate-200 p-1.5 rounded-full transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+
+                    <form onSubmit={handleAddReview} className="space-y-4">
+                      <div className="border-b border-slate-100 pb-3">
+                        <h3 className="font-extrabold text-lg font-display text-brand-navy-900">Add Customer Review</h3>
+                        <p className="text-xs text-slate-400 mt-0.5">Publish a manual/offline review directly to the site</p>
+                      </div>
+
+                      {reviewSubmitSuccess && (
+                        <div className="bg-emerald-50 border border-emerald-200/50 rounded-2xl p-4 text-emerald-800 text-xs font-semibold text-center">
+                          Review added successfully!
+                        </div>
+                      )}
+
+                      {reviewSubmitError && (
+                        <div className="bg-red-50 border border-red-200/50 rounded-2xl p-4 text-red-800 text-xs font-semibold text-center">
+                          {reviewSubmitError}
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Customer Name</label>
+                          <input
+                            type="text"
+                            required
+                            value={newReviewName}
+                            onChange={(e) => setNewReviewName(e.target.value)}
+                            placeholder="John D."
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Location (City, State)</label>
+                          <input
+                            type="text"
+                            required
+                            value={newReviewLocation}
+                            onChange={(e) => setNewReviewLocation(e.target.value)}
+                            placeholder="Mobile, AL"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Service Provided</label>
+                          <select
+                            value={newReviewService}
+                            onChange={(e) => setNewReviewService(e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none text-slate-850"
+                          >
+                            <option value="Panel Upgrade">Panel Upgrade</option>
+                            <option value="Generator Installation">Generator Installation</option>
+                            <option value="Electrical Repair">Electrical Repair</option>
+                            <option value="Safety Inspection">Safety Inspection</option>
+                            <option value="Lighting Installation">Lighting Installation</option>
+                            <option value="Other">Other Service</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Rating</label>
+                          <div className="flex gap-1 items-center mt-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => setNewReviewRating(star)}
+                                className="focus:outline-none"
+                              >
+                                <Star
+                                  className={`w-5 h-5 ${
+                                    newReviewRating >= star ? 'text-brand-gold-500 fill-current' : 'text-slate-200'
+                                  }`}
+                                />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Review Text</label>
+                        <textarea
+                          required
+                          value={newReviewText}
+                          onChange={(e) => setNewReviewText(e.target.value)}
+                          placeholder="Review comments..."
+                          rows={4}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
+                        ></textarea>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full bg-brand-navy-900 hover:bg-brand-navy-950 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-all"
+                      >
+                        Publish Review
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

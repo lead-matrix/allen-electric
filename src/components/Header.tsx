@@ -90,12 +90,15 @@ export const Header: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16 sm:h-18">
 
             {/* Logo */}
-            <Link to="/" className="flex items-center group flex-shrink-0" aria-label="Allen Contractors LLC – Home">
+            <Link to="/" className="flex items-center gap-2 group flex-shrink-0" aria-label="Allen Electric – Home">
               <img
                 src="/logo.png"
                 alt="Allen Contractors LLC Logo"
-                className="h-12 sm:h-14 w-auto object-contain transition-all duration-300 group-hover:scale-105"
+                className="h-10 sm:h-12 w-auto object-contain transition-all duration-300 group-hover:scale-105"
               />
+              <span className="font-display font-black text-base sm:text-lg tracking-tight text-white transition-colors">
+                Allen <span className="text-brand-gold-400">Electric</span>
+              </span>
             </Link>
 
             {/* Desktop nav links */}

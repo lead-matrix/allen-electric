@@ -15,6 +15,8 @@ import { Reviews } from './pages/Reviews';
 import { Contact } from './pages/Contact';
 import { BookingPage } from './pages/BookingPage';
 import { AdminDashboard } from './pages/AdminDashboard';
+import { Privacy } from './pages/Privacy';
+import { Terms } from './pages/Terms';
 import { Phone, Calendar } from 'lucide-react';
 
 // Scroll to top on route change helper
@@ -70,6 +72,8 @@ export const App: React.FC = () => {
               <Route path="/contact" element={<Contact />} />
               <Route path="/book" element={<BookingPage />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
             </Routes>
           </main>
 

@@ -24,7 +24,22 @@ import { Helmet } from 'react-helmet-async';
 
 export const Home: React.FC = () => {
   // Testimonial Carousel state
+  const [reviews, setReviews] = useState<any[]>(initialReviews);
   const [activeReviewIndex, setActiveReviewIndex] = useState(0);
+
+  React.useEffect(() => {
+    const loadReviews = async () => {
+      try {
+        const data = await dbService.getReviews();
+        if (data && data.length > 0) {
+          setReviews(data);
+        }
+      } catch (err) {
+        console.error('Error loading reviews on homepage:', err);
+      }
+    };
+    loadReviews();
+  }, []);
 
   // Estimate Form State
   const [estimateName, setEstimateName] = useState('');
@@ -58,11 +73,11 @@ export const Home: React.FC = () => {
   };
 
   const handleNextReview = () => {
-    setActiveReviewIndex((prev) => (prev + 1) % initialReviews.length);
+    setActiveReviewIndex((prev) => (prev + 1) % reviews.length);
   };
 
   const handlePrevReview = () => {
-    setActiveReviewIndex((prev) => (prev - 1 + initialReviews.length) % initialReviews.length);
+    setActiveReviewIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
   };
 
   // Hero images & before-after comparison images
@@ -468,21 +483,21 @@ export const Home: React.FC = () => {
           <div className="bg-white/5 border border-white/10 p-8 md:p-12 rounded-3xl relative mb-8 min-h-[260px] flex flex-col justify-center">
             {/* Stars */}
             <div className="flex justify-center gap-1 mb-6">
-              {[...Array(initialReviews[activeReviewIndex].rating)].map((_, i) => (
+              {[...Array(reviews[activeReviewIndex]?.rating || 5)].map((_, i) => (
                 <Star key={i} className="w-5 h-5 text-brand-gold-400 fill-current" />
               ))}
             </div>
 
             <p className="text-lg md:text-xl font-light italic leading-relaxed text-slate-200 mb-6 max-w-2xl mx-auto">
-              "{initialReviews[activeReviewIndex].text}"
+              "{reviews[activeReviewIndex]?.text || ''}"
             </p>
 
             <div>
               <p className="font-extrabold text-white text-base font-display">
-                {initialReviews[activeReviewIndex].name}
+                {reviews[activeReviewIndex]?.name || ''}
               </p>
               <p className="text-slate-400 text-xs mt-0.5">
-                {initialReviews[activeReviewIndex].location} &bull; {initialReviews[activeReviewIndex].service}
+                {reviews[activeReviewIndex]?.location || ''} &bull; {reviews[activeReviewIndex]?.service || ''}
               </p>
             </div>
           </div>

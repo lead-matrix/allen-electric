@@ -160,8 +160,8 @@ export const Footer: React.FC = () => {
             <p>Licensed, Insured, & Bonded for Residential & Commercial electrical installations in the state of Alabama.</p>
           </div>
           <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
             <span className="flex items-center gap-1 text-[10px] text-slate-600">
               Made with <Heart className="w-3.5 h-3.5 fill-red-600/30 text-red-600/30" /> in Alabama
             </span>

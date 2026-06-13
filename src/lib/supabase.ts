@@ -144,6 +144,21 @@ export const dbService = {
     return newReview;
   },
 
+  async deleteReview(id: string) {
+    if (supabase) {
+      const { error } = await supabase
+        .from('reviews')
+        .delete()
+        .eq('id', id);
+      if (!error) return true;
+    }
+
+    const current = await this.getReviews();
+    const updated = current.filter((r: any) => r.id !== id);
+    localStorage.setItem(STORAGE_KEYS.REVIEWS, JSON.stringify(updated));
+    return true;
+  },
+
   // Leads, Quotes & Bookings
   async getLeads() {
     if (supabase) {
