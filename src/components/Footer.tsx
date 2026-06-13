@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Zap, Phone, Mail, MapPin, Clock, ShieldCheck, Award, Heart, CheckCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, ShieldCheck, Award, Heart, CheckCircle } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -64,12 +64,11 @@ export const Footer: React.FC = () => {
         {/* About Section */}
         <div>
           <div className="flex items-center gap-2 mb-6">
-            <div className="bg-brand-gold-500 p-2 rounded-lg text-brand-navy-950">
-              <Zap className="w-5 h-5 fill-current" />
-            </div>
-            <span className="font-extrabold text-lg text-white font-display">
-              ALLEN <span className="text-brand-gold-400">ELECTRIC</span>
-            </span>
+            <img
+              src="/logo.png"
+              alt="Allen Contractors LLC Logo"
+              className="h-14 w-auto object-contain"
+            />
           </div>
           <p className="text-sm text-slate-400 mb-6 leading-relaxed">
             Powering Alabama homes and businesses with premium, reliable electrical installations and emergency repairs. Fully licensed, insured, and dedicated to safety.
