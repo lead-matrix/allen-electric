@@ -14,6 +14,7 @@ const navLinks = [
 export const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showPromoBanner, setShowPromoBanner] = useState(true);
   const location = useLocation();
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -63,28 +64,38 @@ export const Header: React.FC = () => {
       <div className="sticky top-0 left-0 right-0 z-50 w-full">
 
         {/* Top emergency banner */}
-        <div className="bg-brand-navy-950 text-white py-2 px-4 text-xs font-medium border-b border-white/5">
-          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-1.5">
-            <div className="flex items-center gap-2">
-              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-ping flex-shrink-0" />
-              <span className="text-slate-300">24/7 Emergency Dispatch Available in Alabama</span>
+        {showPromoBanner && (
+          <div className="bg-brand-navy-950 text-white py-2 px-4 pr-10 text-xs font-medium border-b border-white/5 relative">
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-1.5">
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-ping flex-shrink-0" />
+                <span className="text-slate-300">24/7 Emergency Dispatch Available in Alabama</span>
+              </div>
+              <a
+                href="tel:+12055856431"
+                className="flex items-center gap-1.5 text-brand-gold-400 hover:text-brand-gold-300 transition-colors font-semibold"
+              >
+                <Phone className="w-3.5 h-3.5" />
+                <span>Call Now: +1 (205) 585-6431</span>
+              </a>
             </div>
-            <a
-              href="tel:+12055856431"
-              className="flex items-center gap-1.5 text-brand-gold-400 hover:text-brand-gold-300 transition-colors font-semibold"
+            {/* Close button */}
+            <button
+              onClick={() => setShowPromoBanner(false)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1 rounded transition-colors"
+              aria-label="Dismiss banner"
             >
-              <Phone className="w-3.5 h-3.5" />
-              <span>Call Now: +1 (205) 585-6431</span>
-            </a>
+              <X className="w-3.5 h-3.5" />
+            </button>
           </div>
-        </div>
+        )}
 
         {/* ─── Main nav bar ─── */}
         <header
           className={`w-full transition-all duration-300 ${
             isScrolled
-              ? 'bg-brand-navy-950/95 backdrop-blur-lg shadow-xl shadow-black/30 border-b border-white/5'
-              : 'bg-brand-navy-900 border-b border-white/5 shadow-md'
+              ? 'bg-black/95 backdrop-blur-lg shadow-xl shadow-black/50 border-b border-brand-gold-500/30'
+              : 'bg-brand-navy-900 border-b border-brand-gold-500/20 shadow-md'
           }`}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16 sm:h-18">
