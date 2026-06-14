@@ -415,21 +415,21 @@ export const AdminDashboard: React.FC = () => {
           <meta name="robots" content="noindex, nofollow" />
         </Helmet>
 
-        <section className="min-h-[70vh] flex items-center justify-center bg-slate-50 px-4">
-          <div className="bg-white border border-slate-200 p-8 rounded-3xl shadow-2xl max-w-md w-full relative overflow-hidden">
+        <section className="min-h-[70vh] flex items-center justify-center bg-slate-950 px-4">
+          <div className="bg-slate-900 border border-slate-800/80 p-8 rounded-3xl shadow-2xl max-w-md w-full relative overflow-hidden">
             {/* Logo */}
             <div className="flex flex-col items-center mb-8">
-              <div className="bg-brand-navy-900 p-3 rounded-2xl text-brand-gold-400 mb-3">
+              <div className="bg-slate-800 p-3 rounded-2xl text-brand-gold-400 mb-3 border border-slate-700/50">
                 <Lock className="w-8 h-8" />
               </div>
-              <h1 className="font-extrabold text-2xl text-brand-navy-900 font-display">
+              <h1 className="font-extrabold text-2xl text-white font-display">
                 Allen Electric Portal
               </h1>
               <p className="text-slate-400 text-xs mt-1">Admin Dashboard Login Access Panel</p>
             </div>
 
             {loginError && (
-              <div className="bg-red-50 border border-red-200/50 rounded-2xl p-4 mb-6 text-red-800 text-xs font-semibold text-center">
+              <div className="bg-red-900/50 border border-red-700/50 rounded-2xl p-4 mb-6 text-red-200 text-xs font-semibold text-center">
                 {loginError}
               </div>
             )}
@@ -443,7 +443,7 @@ export const AdminDashboard: React.FC = () => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Enter admin username"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs focus:ring-2 focus:ring-brand-gold-500 focus:outline-none"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-xs text-white placeholder-slate-500 focus:ring-2 focus:ring-brand-gold-500 focus:outline-none"
                 />
               </div>
 
@@ -455,20 +455,20 @@ export const AdminDashboard: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter admin password"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs focus:ring-2 focus:ring-brand-gold-500 focus:outline-none"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-xs text-white placeholder-slate-500 focus:ring-2 focus:ring-brand-gold-500 focus:outline-none"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-brand-navy-900 hover:bg-brand-navy-950 text-white font-black py-4 rounded-xl text-xs uppercase tracking-wider transition-all"
+                className="w-full bg-brand-gold-500 hover:bg-brand-gold-600 text-brand-navy-950 font-black py-4 rounded-xl text-xs uppercase tracking-wider transition-all shadow-lg shadow-brand-gold-500/10"
               >
                 Sign In to Dashboard
               </button>
             </form>
             
-            <div className="mt-6 pt-4 border-t border-slate-100 text-[10px] text-center text-slate-400">
-              <p>Demo Credentials: username: <span className="font-bold">admin</span> / password: <span className="font-bold">allenelectric</span></p>
+            <div className="mt-6 pt-4 border-t border-slate-800 text-[10px] text-center text-slate-500">
+              <p>Demo Credentials: username: <span className="font-bold text-slate-400">admin</span> / password: <span className="font-bold text-slate-400">allenelectric</span></p>
             </div>
           </div>
         </section>
@@ -484,11 +484,11 @@ export const AdminDashboard: React.FC = () => {
       </Helmet>
 
       {/* Main Admin UI */}
-      <section className="bg-slate-50 min-h-screen py-10 px-4 md:px-8">
+      <section className="bg-slate-950 min-h-screen py-10 px-4 md:px-8">
         <div className="max-w-7xl mx-auto space-y-8">
           
           {/* Top Admin Header */}
-          <div className="flex flex-col md:flex-row justify-between items-center bg-brand-navy-900 text-white p-6 rounded-3xl shadow-xl gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-center bg-slate-900 border border-slate-800/80 text-white p-6 rounded-3xl shadow-xl gap-4">
             <div className="flex items-center gap-3">
               <div className="bg-brand-gold-500 text-brand-navy-950 p-2.5 rounded-2xl">
                 <Settings className="w-6 h-6 animate-spin-slow" />
@@ -503,14 +503,14 @@ export const AdminDashboard: React.FC = () => {
 
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
               {/* View Mode Toggle */}
-              <div className="bg-white/5 rounded-2xl p-1 flex items-center border border-white/10 w-full sm:w-auto">
+              <div className="bg-slate-850 rounded-2xl p-1 flex items-center border border-slate-700 w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={() => setViewMode('pipeline')}
                   className={`flex-1 sm:flex-initial py-1.5 px-4 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                     viewMode === 'pipeline'
                       ? 'bg-brand-gold-500 text-brand-navy-950 shadow-md shadow-brand-gold-500/10'
-                      : 'text-slate-300 hover:text-white'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   Pipeline Board
@@ -521,7 +521,7 @@ export const AdminDashboard: React.FC = () => {
                   className={`flex-1 sm:flex-initial py-1.5 px-4 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                     viewMode === 'list'
                       ? 'bg-brand-gold-500 text-brand-navy-950 shadow-md shadow-brand-gold-500/10'
-                      : 'text-slate-300 hover:text-white'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   List Feed
@@ -532,7 +532,7 @@ export const AdminDashboard: React.FC = () => {
                   className={`flex-1 sm:flex-initial py-1.5 px-4 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                     viewMode === 'reviews'
                       ? 'bg-brand-gold-500 text-brand-navy-950 shadow-md shadow-brand-gold-500/10'
-                      : 'text-slate-300 hover:text-white'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   Reviews Control
@@ -554,7 +554,7 @@ export const AdminDashboard: React.FC = () => {
 
               <button
                 onClick={handleLogout}
-                className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/5 py-2.5 px-5 rounded-xl text-xs font-bold transition-colors w-full sm:w-auto"
+                className="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 py-2.5 px-5 rounded-xl text-xs font-bold transition-colors w-full sm:w-auto text-slate-200"
               >
                 <LogOut className="w-4 h-4 text-brand-gold-400" />
                 <span>Sign Out</span>
@@ -570,7 +570,7 @@ export const AdminDashboard: React.FC = () => {
               <div className="lg:col-span-8 space-y-6">
                 
                 {/* Search & Filter bar */}
-                <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm flex flex-col md:flex-row justify-between gap-4 items-center">
+                <div className="bg-slate-900 border border-slate-800/80 rounded-3xl p-5 shadow-sm flex flex-col md:flex-row justify-between gap-4 items-center">
                   <div className="relative w-full md:w-80">
                     <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
@@ -578,7 +578,7 @@ export const AdminDashboard: React.FC = () => {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search by name, phone, service..."
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-xs focus:outline-none"
+                      className="w-full bg-slate-850 border border-slate-700 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-brand-gold-500"
                     />
                   </div>
 
@@ -589,8 +589,8 @@ export const AdminDashboard: React.FC = () => {
                         onClick={() => setFilterType(type)}
                         className={`py-2 px-4 rounded-xl text-xs font-bold transition-all border whitespace-nowrap ${
                           filterType === type
-                            ? 'bg-brand-navy-900 border-brand-navy-900 text-white'
-                            : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                            ? 'bg-brand-gold-500 border-brand-gold-500 text-brand-navy-950'
+                            : 'bg-slate-800 border-slate-700/80 text-slate-300 hover:bg-slate-750'
                         }`}
                       >
                         {type === 'all' && 'All Leads'}
@@ -614,17 +614,17 @@ export const AdminDashboard: React.FC = () => {
                             setSelectedLead(lead);
                             setEditingNotes(lead.notes || '');
                           }}
-                          className={`bg-white rounded-3xl p-5 border transition-all cursor-pointer hover:border-slate-300 shadow-sm ${
-                            isSelected ? 'border-brand-gold-500 ring-2 ring-brand-gold-500/10' : 'border-slate-200'
+                          className={`bg-slate-900 rounded-3xl p-5 border transition-all cursor-pointer hover:border-slate-750 shadow-sm ${
+                            isSelected ? 'border-brand-gold-500 ring-2 ring-brand-gold-500/15' : 'border-slate-805/80'
                           }`}
                         >
                           <div className="flex justify-between items-start mb-3">
                             <div>
                               <div className="flex items-center gap-2">
-                                <h4 className="font-extrabold text-brand-navy-900 text-sm">{lead.name}</h4>
-                                <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                                  lead.type === 'booking' ? 'bg-indigo-50 text-indigo-600' :
-                                  lead.type === 'quote' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-600'
+                                <h4 className="font-extrabold text-white text-sm">{lead.name}</h4>
+                                <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                                  lead.type === 'booking' ? 'bg-indigo-950/60 text-indigo-300 border-indigo-900/40' :
+                                  lead.type === 'quote' ? 'bg-amber-950/60 text-amber-300 border-amber-900/40' : 'bg-slate-800 text-slate-300 border-slate-700/50'
                                 }`}>
                                   {lead.type}
                                 </span>
@@ -632,21 +632,21 @@ export const AdminDashboard: React.FC = () => {
                               <p className="text-[10px] text-slate-400 mt-1">Submitted: {new Date(lead.createdAt).toLocaleDateString()}</p>
                             </div>
 
-                            <span className={`text-[10px] font-bold uppercase px-3 py-1 rounded-full ${
-                              lead.status === 'New' ? 'bg-red-50 text-red-600' :
-                              lead.status === 'Contacted' ? 'bg-blue-50 text-blue-600' :
-                              lead.status === 'Scheduled' ? 'bg-emerald-50 text-emerald-600' :
-                              lead.status === 'Completed' ? 'bg-slate-100 text-slate-600' :
-                              'bg-red-100 text-red-800'
+                            <span className={`text-[10px] font-bold uppercase px-3 py-1 rounded-full border ${
+                              lead.status === 'New' ? 'bg-red-950/60 text-red-300 border-red-900/40' :
+                              lead.status === 'Contacted' ? 'bg-blue-950/60 text-blue-300 border-blue-900/40' :
+                              lead.status === 'Scheduled' ? 'bg-emerald-950/60 text-emerald-300 border-emerald-900/40' :
+                              lead.status === 'Completed' ? 'bg-slate-800 text-slate-300 border-slate-700/40' :
+                              'bg-red-950 text-red-300 border-red-900/40'
                             }`}>
                               {lead.status}
                             </span>
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs text-slate-600 mb-3 bg-slate-50 p-3 rounded-xl">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs text-slate-300 mb-3 bg-slate-850 p-3 rounded-xl border border-slate-800">
                             <div className="flex items-center gap-1.5">
                               <Tag className="w-3.5 h-3.5 text-slate-400" />
-                              <span className="font-bold text-slate-800">{lead.service}</span>
+                              <span className="font-bold text-white">{lead.service}</span>
                             </div>
                             {lead.date && (
                               <div className="flex items-center gap-1.5">
@@ -660,13 +660,13 @@ export const AdminDashboard: React.FC = () => {
                             </div>
                           </div>
 
-                          <p className="text-slate-500 text-xs line-clamp-2 italic">"{lead.details}"</p>
+                          <p className="text-slate-400 text-xs line-clamp-2 italic">"{lead.details}"</p>
                         </div>
                       );
                     })
                   ) : (
-                    <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center text-slate-400">
-                      <Users className="w-10 h-10 mx-auto mb-2 text-slate-300" />
+                    <div className="bg-slate-900 border border-slate-800/80 rounded-3xl p-12 text-center text-slate-500">
+                      <Users className="w-10 h-10 mx-auto mb-2 text-slate-600" />
                       <p className="text-sm">No customer leads found matching filters.</p>
                     </div>
                   )}
@@ -678,38 +678,38 @@ export const AdminDashboard: React.FC = () => {
               <div className="lg:col-span-4 space-y-6">
                 
                 {/* Selected Lead details sheet */}
-                <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm min-h-[350px]">
+                <div className="bg-slate-900 border border-slate-800/80 rounded-3xl p-6 shadow-sm min-h-[350px]">
                   {selectedLead ? (
                     <div className="space-y-5">
-                      <div className="border-b border-slate-100 pb-4">
-                        <h3 className="font-extrabold text-lg font-display text-brand-navy-900">Lead Detail Card</h3>
+                      <div className="border-b border-slate-800 pb-4">
+                        <h3 className="font-extrabold text-lg font-display text-white">Lead Detail Card</h3>
                         <p className="text-xs text-slate-400 mt-1">Manage statuses and dispatcher notes</p>
                       </div>
 
-                      <div className="space-y-3 text-xs text-slate-600">
+                      <div className="space-y-3 text-xs text-slate-300">
                         <div className="flex items-center gap-2">
                           <User className="w-4 h-4 text-slate-400" />
-                          <span className="font-bold text-slate-800">{selectedLead.name}</span>
+                          <span className="font-bold text-white">{selectedLead.name}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Phone className="w-4 h-4 text-slate-400" />
-                          <span>{selectedLead.phone}</span>
+                          <span className="text-slate-250">{selectedLead.phone}</span>
                         </div>
                         {selectedLead.email && (
                           <div className="flex items-center gap-2">
                             <Mail className="w-4 h-4 text-slate-400" />
-                            <span>{selectedLead.email}</span>
+                            <span className="text-slate-250">{selectedLead.email}</span>
                           </div>
                         )}
                         <div className="flex items-center gap-2">
                           <Zap className="w-4 h-4 text-slate-400" />
-                          <span className="font-bold text-brand-navy-900">{selectedLead.service}</span>
+                          <span className="font-bold text-brand-gold-450">{selectedLead.service}</span>
                         </div>
                       </div>
 
                       {/* Status updates selectors */}
                       <div>
-                        <label className="block text-[10px] uppercase font-bold text-slate-400 mb-2">Change Status</label>
+                        <label className="block text-[10px] uppercase font-bold text-slate-405 mb-2">Change Status</label>
                         <div className="grid grid-cols-2 gap-1.5">
                           {['New', 'Contacted', 'Scheduled', 'Completed'].map((s) => (
                             <button
@@ -718,8 +718,8 @@ export const AdminDashboard: React.FC = () => {
                               onClick={() => handleStatusUpdate(selectedLead.id, s)}
                               className={`py-1.5 px-2 rounded-xl text-[10px] font-bold text-center border transition-all ${
                                 selectedLead.status === s
-                                  ? 'bg-brand-navy-900 border-brand-navy-900 text-white'
-                                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                                  ? 'bg-brand-gold-500 border-brand-gold-500 text-brand-navy-950 shadow-sm'
+                                  : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-750'
                               }`}
                             >
                               {s}
@@ -730,7 +730,7 @@ export const AdminDashboard: React.FC = () => {
 
                       {/* Photo preview */}
                       {selectedLead.photoUrl && (
-                        <div className="border border-slate-200 rounded-2xl overflow-hidden p-2 bg-slate-50">
+                        <div className="border border-slate-800 rounded-2xl overflow-hidden p-2 bg-slate-950">
                           <p className="text-[9px] uppercase font-bold text-slate-400 mb-1.5">Job Image Attached:</p>
                           <img 
                             src={selectedLead.photoUrl} 
@@ -744,9 +744,9 @@ export const AdminDashboard: React.FC = () => {
                       {/* Dispatch Notes Logger */}
                       <div>
                         <div className="flex justify-between items-center mb-2">
-                          <label className="block text-[10px] uppercase font-bold text-slate-400">Dispatcher Notes</label>
+                          <label className="block text-[10px] uppercase font-bold text-slate-405">Dispatcher Notes</label>
                           {updateSuccess && (
-                            <span className="text-[9px] text-emerald-600 font-bold">Saved!</span>
+                            <span className="text-[9px] text-emerald-400 font-bold">Saved!</span>
                           )}
                         </div>
                         <textarea
@@ -754,11 +754,11 @@ export const AdminDashboard: React.FC = () => {
                           onChange={(e) => setEditingNotes(e.target.value)}
                           placeholder="Add scheduling notes or discount approvals..."
                           rows={3}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
+                          className="w-full bg-slate-850 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
                         ></textarea>
                         <button
                           onClick={() => handleSaveNotes(selectedLead.id)}
-                          className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-xl text-[10px] uppercase tracking-wide mt-2 transition-all"
+                          className="w-full bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 font-bold py-2 rounded-xl text-[10px] uppercase tracking-wide mt-2 transition-all"
                         >
                           Save Dispatch Notes
                         </button>
@@ -766,8 +766,8 @@ export const AdminDashboard: React.FC = () => {
 
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center text-center text-slate-400 py-12 h-full">
-                      <FileText className="w-10 h-10 text-slate-300 mb-2 animate-pulse" />
+                    <div className="flex flex-col items-center justify-center text-center text-slate-500 py-12 h-full">
+                      <FileText className="w-10 h-10 text-slate-600 mb-2 animate-pulse" />
                       <p className="text-xs">Select a customer lead from the list to display details and edit dispatcher notes.</p>
                     </div>
                   )}
@@ -794,7 +794,7 @@ export const AdminDashboard: React.FC = () => {
             <div className="space-y-6">
               
               {/* Search & Filter bar */}
-              <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm flex flex-col md:flex-row justify-between gap-4 items-center">
+              <div className="bg-slate-900 border border-slate-800/80 rounded-3xl p-5 shadow-sm flex flex-col md:flex-row justify-between gap-4 items-center">
                 <div className="relative w-full md:w-80">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
@@ -802,7 +802,7 @@ export const AdminDashboard: React.FC = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Filter pipeline by name, phone..."
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-xs focus:outline-none"
+                    className="w-full bg-slate-850 border border-slate-700 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-brand-gold-500"
                   />
                 </div>
 
@@ -813,8 +813,8 @@ export const AdminDashboard: React.FC = () => {
                       onClick={() => setFilterType(type)}
                       className={`py-2 px-4 rounded-xl text-xs font-bold transition-all border whitespace-nowrap ${
                         filterType === type
-                          ? 'bg-brand-navy-900 border-brand-navy-900 text-white'
-                          : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                          ? 'bg-brand-gold-500 border-brand-gold-500 text-brand-navy-950'
+                          : 'bg-slate-800 border-slate-700/80 text-slate-300 hover:bg-slate-750'
                       }`}
                     >
                       {type === 'all' && 'All Types'}
@@ -835,19 +835,19 @@ export const AdminDashboard: React.FC = () => {
                       key={colStatus}
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDrop(e, colStatus)}
-                      className="bg-slate-100/90 border border-slate-200/50 rounded-3xl p-4 flex flex-col min-h-[500px] shadow-inner text-left"
+                      className="bg-slate-900 border border-slate-800/80 rounded-3xl p-4 flex flex-col min-h-[500px] shadow-inner text-left"
                     >
                       {/* Column Header */}
-                      <div className="flex justify-between items-center mb-4 pb-2 border-b border-slate-200/60">
-                        <h3 className="font-extrabold text-xs text-brand-navy-900 uppercase tracking-widest flex items-center gap-2">
+                      <div className="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
+                        <h3 className="font-extrabold text-xs text-slate-100 uppercase tracking-widest flex items-center gap-2">
                           <span className={`w-2.5 h-2.5 rounded-full ${
                             colStatus === 'New' ? 'bg-red-500' :
                             colStatus === 'Contacted' ? 'bg-blue-500 animate-pulse' :
-                            colStatus === 'Scheduled' ? 'bg-emerald-500' : 'bg-slate-400'
+                            colStatus === 'Scheduled' ? 'bg-emerald-500' : 'bg-slate-500'
                           }`} />
                           {colStatus === 'New' ? 'New Leads' : colStatus}
                         </h3>
-                        <span className="text-[10px] bg-slate-250 text-brand-navy-950 font-bold px-2.5 py-0.5 rounded-full border border-slate-300/40">
+                        <span className="text-[10px] bg-slate-800 text-slate-200 font-bold px-2.5 py-0.5 rounded-full border border-slate-700">
                           {colLeads.length}
                         </span>
                       </div>
@@ -864,34 +864,34 @@ export const AdminDashboard: React.FC = () => {
                                 setSelectedLead(lead);
                                 setEditingNotes(lead.notes || '');
                               }}
-                              className="bg-white border border-slate-200/70 hover:border-brand-gold-500 hover:ring-2 hover:ring-brand-gold-500/10 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing group relative space-y-2"
+                              className="bg-slate-800 border border-slate-700/60 hover:border-brand-gold-500 hover:ring-2 hover:ring-brand-gold-500/15 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing group relative space-y-2"
                             >
                               <div className="flex justify-between items-start gap-2">
-                                <h4 className="font-extrabold text-brand-navy-900 text-xs line-clamp-1">{lead.name}</h4>
-                                <span className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full flex-shrink-0 ${
-                                  lead.type === 'booking' ? 'bg-indigo-50 text-indigo-600' :
-                                  lead.type === 'quote' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-600'
+                                <h4 className="font-extrabold text-white text-xs line-clamp-1">{lead.name}</h4>
+                                <span className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full flex-shrink-0 border ${
+                                  lead.type === 'booking' ? 'bg-indigo-950/60 text-indigo-300 border-indigo-900/40' :
+                                  lead.type === 'quote' ? 'bg-amber-950/60 text-amber-300 border-amber-900/40' : 'bg-slate-900/60 text-slate-300 border-slate-800/40'
                                 }`}>
                                   {lead.type}
                                 </span>
                               </div>
 
-                              <p className="text-[9px] text-slate-400">
+                              <p className="text-[9px] text-slate-405">
                                 Date: {new Date(lead.createdAt).toLocaleDateString()}
                               </p>
 
-                              <div className="text-[10px] text-slate-600 bg-slate-50 p-2.5 rounded-xl space-y-1">
-                                <p className="font-bold text-slate-800 line-clamp-1">{lead.service}</p>
+                              <div className="text-[10px] text-slate-300 bg-slate-850 p-2.5 rounded-xl space-y-1 border border-slate-800">
+                                <p className="font-bold text-white line-clamp-1">{lead.service}</p>
                                 <p className="line-clamp-1 font-mono">{lead.phone}</p>
                               </div>
 
-                              <p className="text-[10px] text-slate-500 italic line-clamp-2">
+                              <p className="text-[10px] text-slate-400 italic line-clamp-2">
                                 "{lead.details || 'No additional details.'}"
                               </p>
 
                               {/* Drag Hint & Quick Pipeline Transition Actions */}
-                              <div className="pt-2 border-t border-slate-100 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                <span className="text-[8px] text-slate-400">Drag card or click</span>
+                              <div className="pt-2 border-t border-slate-700 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span className="text-[8px] text-slate-500">Drag card or click</span>
                                 <div className="flex gap-0.5">
                                   {colStatus !== 'New' && (
                                     <button
@@ -902,7 +902,7 @@ export const AdminDashboard: React.FC = () => {
                                         const prevStatus = colStatus === 'Contacted' ? 'New' : colStatus === 'Scheduled' ? 'Contacted' : 'Scheduled';
                                         handleStatusUpdate(lead.id, prevStatus);
                                       }}
-                                      className="p-1 hover:bg-slate-100 rounded text-slate-600 font-extrabold text-xs transition-colors"
+                                      className="p-1 hover:bg-slate-700 rounded text-slate-300 font-extrabold text-xs transition-colors"
                                     >
                                       &larr;
                                     </button>
@@ -916,7 +916,7 @@ export const AdminDashboard: React.FC = () => {
                                         const nextStatus = colStatus === 'New' ? 'Contacted' : colStatus === 'Contacted' ? 'Scheduled' : 'Completed';
                                         handleStatusUpdate(lead.id, nextStatus);
                                       }}
-                                      className="p-1 hover:bg-slate-100 rounded text-slate-600 font-extrabold text-xs transition-colors"
+                                      className="p-1 hover:bg-slate-700 rounded text-slate-300 font-extrabold text-xs transition-colors"
                                     >
                                       &rarr;
                                     </button>
@@ -926,7 +926,7 @@ export const AdminDashboard: React.FC = () => {
                             </div>
                           ))
                         ) : (
-                          <div className="py-16 text-center text-slate-400 text-xs border border-dashed border-slate-200 rounded-2xl h-full flex flex-col justify-center">
+                          <div className="py-16 text-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-2xl h-full flex flex-col justify-center">
                             No Leads in Status
                           </div>
                         )}
@@ -940,7 +940,7 @@ export const AdminDashboard: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pt-4">
                 <div className="md:col-span-6">
                   {/* Mock Email Alert Logs Console */}
-                  <div className="bg-brand-navy-900 border border-white/5 rounded-3xl p-5 text-white shadow-xl text-left h-full">
+                  <div className="bg-slate-900 border border-slate-800/80 rounded-3xl p-5 text-white shadow-xl text-left h-full">
                     <h4 className="font-extrabold text-sm font-display mb-3 flex items-center gap-1.5 text-brand-gold-400">
                       <MailWarning className="w-4 h-4" />
                       Live Dispatch Notifications
@@ -953,9 +953,9 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="md:col-span-6 flex flex-col justify-center bg-white border border-slate-200 rounded-3xl p-6 shadow-sm text-center">
+                <div className="md:col-span-6 flex flex-col justify-center bg-slate-900 border border-slate-800/80 rounded-3xl p-6 shadow-sm text-center">
                   <FileText className="w-8 h-8 text-brand-gold-500 mx-auto mb-2 animate-bounce" />
-                  <h4 className="font-extrabold text-slate-800 text-sm">Real-time Pipeline sync active</h4>
+                  <h4 className="font-extrabold text-white text-sm">Real-time Pipeline sync active</h4>
                   <p className="text-slate-400 text-xs mt-1">
                     Forms completed anywhere on the site populate this board instantly. Try dropping cards to update dispatcher statuses.
                   </p>
@@ -967,9 +967,9 @@ export const AdminDashboard: React.FC = () => {
             /* ─── Reviews Control View Mode ─── */
             <div className="space-y-6">
               {/* Header and Actions */}
-              <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="bg-slate-900 border border-slate-800/80 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="text-left w-full">
-                  <h3 className="font-extrabold text-lg font-display text-brand-navy-900 flex items-center gap-2">
+                  <h3 className="font-extrabold text-lg font-display text-white flex items-center gap-2">
                     <MessageSquare className="w-5 h-5 text-brand-gold-500" />
                     Customer Reviews Moderation
                   </h3>
@@ -985,9 +985,9 @@ export const AdminDashboard: React.FC = () => {
                     setReviewSubmitError('');
                     setShowAddReviewModal(true);
                   }}
-                  className="bg-brand-navy-900 hover:bg-brand-navy-950 text-white font-bold py-2.5 px-5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md hover:shadow-lg shrink-0 w-full sm:w-auto justify-center"
+                  className="bg-brand-gold-500 hover:bg-brand-gold-600 text-brand-navy-950 font-bold py-2.5 px-5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md hover:shadow-lg shrink-0 w-full sm:w-auto justify-center"
                 >
-                  <Plus className="w-4 h-4 text-brand-gold-400" />
+                  <Plus className="w-4 h-4 text-brand-navy-950" />
                   <span>Add Review</span>
                 </button>
               </div>
@@ -998,13 +998,13 @@ export const AdminDashboard: React.FC = () => {
                   reviews.map((rev) => (
                     <div
                       key={rev.id}
-                      className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow relative flex flex-col justify-between text-left"
+                      className="bg-slate-900 border border-slate-800/80 rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow relative flex flex-col justify-between text-left"
                     >
                       {/* Delete Button */}
                       <button
                         type="button"
                         onClick={() => handleDeleteReview(rev.id)}
-                        className="absolute top-4 right-4 text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-xl transition-colors"
+                        className="absolute top-4 right-4 text-red-400 hover:text-red-300 bg-red-950/40 hover:bg-red-900/60 p-2 rounded-xl transition-colors"
                         title="Delete Review"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1013,7 +1013,7 @@ export const AdminDashboard: React.FC = () => {
                       <div className="space-y-4">
                         {/* Header info */}
                         <div className="pr-8">
-                          <h4 className="font-extrabold text-brand-navy-900 text-sm font-display">{rev.name}</h4>
+                          <h4 className="font-extrabold text-white text-sm font-display">{rev.name}</h4>
                           <p className="text-[10px] text-slate-400 mt-0.5">
                             {rev.location} &bull; {rev.service}
                           </p>
@@ -1025,28 +1025,28 @@ export const AdminDashboard: React.FC = () => {
                             <Star key={i} className="w-3.5 h-3.5 fill-current" />
                           ))}
                           {[...Array(5 - rev.rating)].map((_, i) => (
-                            <Star key={i} className="w-3.5 h-3.5 text-slate-200" />
+                            <Star key={i} className="w-3.5 h-3.5 text-slate-700" />
                           ))}
                         </div>
 
                         {/* Review text */}
-                        <p className="text-slate-655 text-xs leading-relaxed italic text-slate-600">
+                        <p className="text-slate-300 text-xs leading-relaxed italic">
                           "{rev.text}"
                         </p>
                       </div>
 
                       {/* Footer date */}
-                      <div className="pt-4 mt-4 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400">
+                      <div className="pt-4 mt-4 border-t border-slate-800 flex justify-between items-center text-[10px] text-slate-405">
                         <span>Date: {rev.date}</span>
-                        <span className="font-semibold text-brand-gold-600 bg-brand-gold-50/50 px-2 py-0.5 rounded-full border border-brand-gold-100">
+                        <span className="font-semibold text-brand-gold-450 bg-brand-gold-950/40 px-2 py-0.5 rounded-full border border-brand-gold-900/40">
                           Published
                         </span>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="col-span-full bg-white border border-slate-200 rounded-3xl p-12 text-center text-slate-400">
-                    <MessageSquare className="w-10 h-10 mx-auto mb-2 text-slate-300" />
+                  <div className="col-span-full bg-slate-900 border border-slate-800/80 rounded-3xl p-12 text-center text-slate-500">
+                    <MessageSquare className="w-10 h-10 mx-auto mb-2 text-slate-600" />
                     <p className="text-sm">No reviews found.</p>
                   </div>
                 )}
@@ -1055,75 +1055,75 @@ export const AdminDashboard: React.FC = () => {
               {/* Add Review Modal */}
               {showAddReviewModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-brand-navy-950/65 backdrop-blur-sm p-4">
-                  <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl max-w-md w-full relative text-left">
+                  <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl max-w-md w-full relative text-left">
                     <button
                       onClick={() => setShowAddReviewModal(false)}
-                      className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 focus:outline-none bg-slate-100 hover:bg-slate-200 p-1.5 rounded-full transition-colors"
+                      className="absolute top-4 right-4 text-slate-400 hover:text-white focus:outline-none bg-slate-800 hover:bg-slate-750 p-1.5 rounded-full transition-colors"
                     >
                       <X className="w-4 h-4" />
                     </button>
 
                     <form onSubmit={handleAddReview} className="space-y-4">
-                      <div className="border-b border-slate-100 pb-3">
-                        <h3 className="font-extrabold text-lg font-display text-brand-navy-900">Add Customer Review</h3>
-                        <p className="text-xs text-slate-400 mt-0.5">Publish a manual/offline review directly to the site</p>
+                      <div className="border-b border-slate-800 pb-3">
+                        <h3 className="font-extrabold text-lg font-display text-white">Add Customer Review</h3>
+                        <p className="text-xs text-slate-405 mt-0.5">Publish a manual/offline review directly to the site</p>
                       </div>
 
                       {reviewSubmitSuccess && (
-                        <div className="bg-emerald-50 border border-emerald-200/50 rounded-2xl p-4 text-emerald-800 text-xs font-semibold text-center">
+                        <div className="bg-emerald-950/50 border border-emerald-800/40 rounded-2xl p-4 text-emerald-300 text-xs font-semibold text-center">
                           Review added successfully!
                         </div>
                       )}
 
                       {reviewSubmitError && (
-                        <div className="bg-red-50 border border-red-200/50 rounded-2xl p-4 text-red-800 text-xs font-semibold text-center">
+                        <div className="bg-red-950/50 border border-red-800/40 rounded-2xl p-4 text-red-305 text-xs font-semibold text-center">
                           {reviewSubmitError}
                         </div>
                       )}
 
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Customer Name</label>
+                          <label className="block text-[10px] uppercase font-bold text-slate-405 mb-1">Customer Name</label>
                           <input
                             type="text"
                             required
                             value={newReviewName}
                             onChange={(e) => setNewReviewName(e.target.value)}
                             placeholder="John D."
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
+                            className="w-full bg-slate-850 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Location (City, State)</label>
+                          <label className="block text-[10px] uppercase font-bold text-slate-405 mb-1">Location (City, State)</label>
                           <input
                             type="text"
                             required
                             value={newReviewLocation}
                             onChange={(e) => setNewReviewLocation(e.target.value)}
                             placeholder="Mobile, AL"
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
+                            className="w-full bg-slate-850 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
                           />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Service Provided</label>
+                          <label className="block text-[10px] uppercase font-bold text-slate-405 mb-1">Service Provided</label>
                           <select
                             value={newReviewService}
                             onChange={(e) => setNewReviewService(e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none text-slate-850"
+                            className="w-full bg-slate-850 border border-slate-700 rounded-xl p-3 text-xs focus:outline-none text-white bg-slate-900"
                           >
-                            <option value="Panel Upgrade">Panel Upgrade</option>
-                            <option value="Generator Installation">Generator Installation</option>
-                            <option value="Electrical Repair">Electrical Repair</option>
-                            <option value="Safety Inspection">Safety Inspection</option>
-                            <option value="Lighting Installation">Lighting Installation</option>
-                            <option value="Other">Other Service</option>
+                            <option value="Panel Upgrade" className="bg-slate-900">Panel Upgrade</option>
+                            <option value="Generator Installation" className="bg-slate-900">Generator Installation</option>
+                            <option value="Electrical Repair" className="bg-slate-900">Electrical Repair</option>
+                            <option value="Safety Inspection" className="bg-slate-900">Safety Inspection</option>
+                            <option value="Lighting Installation" className="bg-slate-900">Lighting Installation</option>
+                            <option value="Other" className="bg-slate-900">Other Service</option>
                           </select>
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Rating</label>
+                          <label className="block text-[10px] uppercase font-bold text-slate-405 mb-1">Rating</label>
                           <div className="flex gap-1 items-center mt-1">
                             {[1, 2, 3, 4, 5].map((star) => (
                               <button
@@ -1134,7 +1134,7 @@ export const AdminDashboard: React.FC = () => {
                               >
                                 <Star
                                   className={`w-5 h-5 ${
-                                    newReviewRating >= star ? 'text-brand-gold-500 fill-current' : 'text-slate-200'
+                                    newReviewRating >= star ? 'text-brand-gold-500 fill-current' : 'text-slate-700'
                                   }`}
                                 />
                               </button>
@@ -1144,20 +1144,20 @@ export const AdminDashboard: React.FC = () => {
                       </div>
 
                       <div>
-                        <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Review Text</label>
+                        <label className="block text-[10px] uppercase font-bold text-slate-405 mb-1">Review Text</label>
                         <textarea
                           required
                           value={newReviewText}
                           onChange={(e) => setNewReviewText(e.target.value)}
                           placeholder="Review comments..."
                           rows={4}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
+                          className="w-full bg-slate-850 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
                         ></textarea>
                       </div>
 
                       <button
                         type="submit"
-                        className="w-full bg-brand-navy-900 hover:bg-brand-navy-950 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-all"
+                        className="w-full bg-brand-gold-500 hover:bg-brand-gold-600 text-brand-navy-950 font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-all"
                       >
                         Publish Review
                       </button>
@@ -1171,95 +1171,95 @@ export const AdminDashboard: React.FC = () => {
           {/* Add Lead Modal */}
           {showAddLeadModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-brand-navy-950/65 backdrop-blur-sm p-4">
-              <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl max-w-md w-full relative text-left text-slate-800">
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl max-w-md w-full relative text-left text-white">
                 <button
                   onClick={() => setShowAddLeadModal(false)}
-                  className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 focus:outline-none bg-slate-100 hover:bg-slate-200 p-1.5 rounded-full transition-colors"
+                  className="absolute top-4 right-4 text-slate-400 hover:text-white focus:outline-none bg-slate-800 hover:bg-slate-750 p-1.5 rounded-full transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
 
                 <form onSubmit={handleAddLead} className="space-y-4">
-                  <div className="border-b border-slate-100 pb-3">
-                    <h3 className="font-extrabold text-lg font-display text-brand-navy-900">Log New Lead</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">Manually record an offline booking or quote</p>
+                  <div className="border-b border-slate-800 pb-3">
+                    <h3 className="font-extrabold text-lg font-display text-white">Log New Lead</h3>
+                    <p className="text-slate-400 text-xs mt-0.5">Manually record an offline booking or quote</p>
                   </div>
 
                   {leadSubmitSuccess && (
-                    <div className="bg-emerald-50 border border-emerald-200/50 rounded-2xl p-4 text-emerald-800 text-xs font-semibold text-center">
+                    <div className="bg-emerald-950/50 border border-emerald-800/40 rounded-2xl p-4 text-emerald-305 text-xs font-semibold text-center">
                       Lead logged successfully!
                     </div>
                   )}
 
                   {leadSubmitError && (
-                    <div className="bg-red-50 border border-red-200/50 rounded-2xl p-4 text-red-800 text-xs font-semibold text-center">
+                    <div className="bg-red-950/50 border border-red-800/40 rounded-2xl p-4 text-red-305 text-xs font-semibold text-center">
                       {leadSubmitError}
                     </div>
                   )}
 
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Customer Name *</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-405 mb-1">Customer Name *</label>
                     <input
                       type="text"
                       required
                       value={newLeadName}
                       onChange={(e) => setNewLeadName(e.target.value)}
                       placeholder="Jane Doe"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none text-slate-800"
+                      className="w-full bg-slate-850 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Phone Number *</label>
+                      <label className="block text-[10px] uppercase font-bold text-slate-405 mb-1">Phone Number *</label>
                       <input
                         type="text"
                         required
                         value={newLeadPhone}
                         onChange={(e) => setNewLeadPhone(e.target.value)}
                         placeholder="205-555-0199"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none text-slate-800"
+                        className="w-full bg-slate-850 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Email Address</label>
+                      <label className="block text-[10px] uppercase font-bold text-slate-405 mb-1">Email Address</label>
                       <input
                         type="email"
                         value={newLeadEmail}
                         onChange={(e) => setNewLeadEmail(e.target.value)}
                         placeholder="jane@example.com"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none text-slate-800"
+                        className="w-full bg-slate-850 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Lead Type</label>
+                      <label className="block text-[10px] uppercase font-bold text-slate-405 mb-1">Lead Type</label>
                       <select
                         value={newLeadType}
                         onChange={(e) => setNewLeadType(e.target.value as 'booking' | 'quote' | 'contact')}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none text-slate-850"
+                        className="w-full bg-slate-850 border border-slate-700 rounded-xl p-3 text-xs focus:outline-none text-white bg-slate-900"
                       >
-                        <option value="booking">Booking</option>
-                        <option value="quote">Quote Request</option>
-                        <option value="contact">General Contact</option>
+                        <option value="booking" className="bg-slate-900">Booking</option>
+                        <option value="quote" className="bg-slate-900">Quote Request</option>
+                        <option value="contact" className="bg-slate-900">General Contact</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Service Required</label>
+                      <label className="block text-[10px] uppercase font-bold text-slate-405 mb-1">Service Required</label>
                       <select
                         value={newLeadService}
                         onChange={(e) => setNewLeadService(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none text-slate-850"
+                        className="w-full bg-slate-850 border border-slate-700 rounded-xl p-3 text-xs focus:outline-none text-white bg-slate-900"
                       >
-                        <option value="Panel Upgrades">Panel Upgrades</option>
-                        <option value="Electrical Repairs">Electrical Repairs</option>
-                        <option value="Generator Installation">Generator Installation</option>
-                        <option value="Emergency Services">Emergency Services</option>
-                        <option value="Lighting Installation">Lighting Installation</option>
-                        <option value="Commercial Services">Commercial Services</option>
-                        <option value="Other">Other Service</option>
+                        <option value="Panel Upgrades" className="bg-slate-900">Panel Upgrades</option>
+                        <option value="Electrical Repairs" className="bg-slate-900">Electrical Repairs</option>
+                        <option value="Generator Installation" className="bg-slate-900">Generator Installation</option>
+                        <option value="Emergency Services" className="bg-slate-900">Emergency Services</option>
+                        <option value="Lighting Installation" className="bg-slate-900">Lighting Installation</option>
+                        <option value="Commercial Services" className="bg-slate-900">Commercial Services</option>
+                        <option value="Other" className="bg-slate-900">Other Service</option>
                       </select>
                     </div>
                   </div>
@@ -1267,41 +1267,41 @@ export const AdminDashboard: React.FC = () => {
                   {newLeadType === 'booking' && (
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Preferred Date</label>
+                        <label className="block text-[10px] uppercase font-bold text-slate-405 mb-1">Preferred Date</label>
                         <input
                           type="date"
                           value={newLeadDate}
                           onChange={(e) => setNewLeadDate(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none text-slate-800"
+                          className="w-full bg-slate-850 border border-slate-700 rounded-xl p-3 text-xs focus:outline-none text-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Preferred Time</label>
+                        <label className="block text-[10px] uppercase font-bold text-slate-405 mb-1">Preferred Time</label>
                         <input
                           type="text"
                           value={newLeadTime}
                           onChange={(e) => setNewLeadTime(e.target.value)}
                           placeholder="e.g. 09:00 AM"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none text-slate-800"
+                          className="w-full bg-slate-850 border border-slate-700 rounded-xl p-3 text-xs focus:outline-none text-white placeholder-slate-500"
                         />
                       </div>
                     </div>
                   )}
 
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Lead Details / Notes</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-405 mb-1">Lead Details / Notes</label>
                     <textarea
                       value={newLeadDetails}
                       onChange={(e) => setNewLeadDetails(e.target.value)}
                       placeholder="Enter description of electrical issues, special instructions..."
                       rows={3}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none text-slate-800"
+                      className="w-full bg-slate-850 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
                     ></textarea>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full bg-brand-navy-900 hover:bg-brand-navy-950 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-all"
+                    className="w-full bg-brand-gold-500 hover:bg-brand-gold-600 text-brand-navy-950 font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-all"
                   >
                     Log Lead
                   </button>
@@ -1313,44 +1313,44 @@ export const AdminDashboard: React.FC = () => {
           {/* Modal for Lead Details in Pipeline Mode */}
           {selectedLead && viewMode === 'pipeline' && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-brand-navy-950/65 backdrop-blur-sm p-4">
-              <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl max-w-md w-full relative text-left">
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl max-w-md w-full relative text-left text-white">
                 <button
                   onClick={() => setSelectedLead(null)}
-                  className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 focus:outline-none bg-slate-100 hover:bg-slate-200 p-1.5 rounded-full transition-colors"
+                  className="absolute top-4 right-4 text-slate-400 hover:text-white focus:outline-none bg-slate-800 hover:bg-slate-750 p-1.5 rounded-full transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
                 
                 <div className="space-y-5">
-                  <div className="border-b border-slate-100 pb-3">
-                    <h3 className="font-extrabold text-lg font-display text-brand-navy-900">Lead Detail Card</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">Manage statuses and notes</p>
+                  <div className="border-b border-slate-800 pb-3">
+                    <h3 className="font-extrabold text-lg font-display text-white">Lead Detail Card</h3>
+                    <p className="text-xs text-slate-405 mt-0.5">Manage statuses and notes</p>
                   </div>
 
-                  <div className="space-y-3 text-xs text-slate-600">
+                  <div className="space-y-3 text-xs text-slate-300">
                     <div className="flex items-center gap-2">
                       <User className="w-4 h-4 text-slate-400" />
-                      <span className="font-bold text-slate-800">{selectedLead.name}</span>
+                      <span className="font-bold text-white">{selectedLead.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Phone className="w-4 h-4 text-slate-400" />
-                      <span className="font-mono">{selectedLead.phone}</span>
+                      <span className="font-mono text-slate-250">{selectedLead.phone}</span>
                     </div>
                     {selectedLead.email && (
                       <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4 text-slate-400" />
-                        <span>{selectedLead.email}</span>
+                        <span className="text-slate-250">{selectedLead.email}</span>
                       </div>
                     )}
                     <div className="flex items-center gap-2">
                       <Zap className="w-4 h-4 text-slate-400" />
-                      <span className="font-bold text-brand-navy-900">{selectedLead.service}</span>
+                      <span className="font-bold text-brand-gold-450">{selectedLead.service}</span>
                     </div>
                   </div>
 
                   {/* Status updates selectors */}
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-2">Change Status</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-405 mb-2">Change Status</label>
                     <div className="grid grid-cols-2 gap-1.5">
                       {['New', 'Contacted', 'Scheduled', 'Completed'].map((s) => (
                         <button
@@ -1359,8 +1359,8 @@ export const AdminDashboard: React.FC = () => {
                           onClick={() => handleStatusUpdate(selectedLead.id, s)}
                           className={`py-1.5 px-2 rounded-xl text-[10px] font-bold text-center border transition-all ${
                             selectedLead.status === s
-                              ? 'bg-brand-navy-900 border-brand-navy-900 text-white shadow-sm'
-                              : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                              ? 'bg-brand-gold-500 border-brand-gold-500 text-brand-navy-950 shadow-sm'
+                              : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-750'
                           }`}
                         >
                           {s}
@@ -1371,7 +1371,7 @@ export const AdminDashboard: React.FC = () => {
 
                   {/* Photo preview */}
                   {selectedLead.photoUrl && (
-                    <div className="border border-slate-200 rounded-2xl overflow-hidden p-2 bg-slate-50">
+                    <div className="border border-slate-800 rounded-2xl overflow-hidden p-2 bg-slate-950">
                       <p className="text-[9px] uppercase font-bold text-slate-400 mb-1.5">Job Image Attached:</p>
                       <img 
                         src={selectedLead.photoUrl} 
@@ -1385,9 +1385,9 @@ export const AdminDashboard: React.FC = () => {
                   {/* Dispatch Notes Logger */}
                   <div>
                     <div className="flex justify-between items-center mb-2">
-                      <label className="block text-[10px] uppercase font-bold text-slate-400">Dispatcher Notes</label>
+                      <label className="block text-[10px] uppercase font-bold text-slate-405">Dispatcher Notes</label>
                       {updateSuccess && (
-                        <span className="text-[9px] text-emerald-600 font-bold">Saved!</span>
+                        <span className="text-[9px] text-emerald-450 font-bold">Saved!</span>
                       )}
                     </div>
                     <textarea
@@ -1395,11 +1395,11 @@ export const AdminDashboard: React.FC = () => {
                       onChange={(e) => setEditingNotes(e.target.value)}
                       placeholder="Add scheduling notes or discount approvals..."
                       rows={3}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
+                      className="w-full bg-slate-850 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-brand-gold-500 focus:outline-none"
                     ></textarea>
                     <button
                       onClick={() => handleSaveNotes(selectedLead.id)}
-                      className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-xl text-[10px] uppercase tracking-wide mt-2 transition-all border border-slate-200/50"
+                      className="w-full bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-705 font-bold py-2 rounded-xl text-[10px] uppercase tracking-wide mt-2 transition-all"
                     >
                       Save Dispatch Notes
                     </button>
@@ -1410,8 +1410,8 @@ export const AdminDashboard: React.FC = () => {
           )}
 
           {/* Bottom Calendar agenda list */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
-            <h3 className="font-extrabold text-lg font-display text-brand-navy-900 mb-4 flex items-center gap-2">
+          <div className="bg-slate-900 border border-slate-800/80 rounded-3xl p-6 shadow-sm">
+            <h3 className="font-extrabold text-lg font-display text-white mb-4 flex items-center gap-2">
               <Calendar className="w-5 h-5 text-brand-gold-500" />
               Calendar Agenda View
             </h3>
@@ -1419,18 +1419,18 @@ export const AdminDashboard: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               {upcomingBookings.length > 0 ? (
                 upcomingBookings.slice(0, 4).map((book) => (
-                  <div key={book.id} className="bg-slate-50 border border-slate-200/50 p-4 rounded-2xl">
+                  <div key={book.id} className="bg-slate-800 border border-slate-705 p-4 rounded-2xl">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-[10px] bg-indigo-50 text-indigo-600 font-bold px-2 py-0.5 rounded-full">{book.time}</span>
-                      <span className="text-[9px] text-slate-400 font-semibold">{book.date}</span>
+                      <span className="text-[10px] bg-indigo-950/60 text-indigo-300 font-bold px-2 py-0.5 rounded-full border border-indigo-900/40">{book.time}</span>
+                      <span className="text-[9px] text-slate-405 font-semibold">{book.date}</span>
                     </div>
-                    <h4 className="font-bold text-slate-800 text-xs line-clamp-1">{book.name}</h4>
-                    <p className="text-[10px] text-brand-navy-900 font-semibold mt-1">{book.service}</p>
-                    <p className="text-[9px] text-slate-400 mt-2 line-clamp-1">Notes: {book.notes || 'None'}</p>
+                    <h4 className="font-bold text-slate-100 text-xs line-clamp-1">{book.name}</h4>
+                    <p className="text-[10px] text-brand-gold-450 font-semibold mt-1">{book.service}</p>
+                    <p className="text-[9px] text-slate-405 mt-2 line-clamp-1">Notes: {book.notes || 'None'}</p>
                   </div>
                 ))
               ) : (
-                <div className="col-span-full py-6 text-center text-slate-400 text-xs">
+                <div className="col-span-full py-6 text-center text-slate-500 text-xs">
                   No upcoming bookings scheduled on the calendar.
                 </div>
               )}

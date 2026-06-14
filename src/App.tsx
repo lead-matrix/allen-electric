@@ -55,7 +55,7 @@ const AppContent: React.FC = () => {
   const isAdminPath = location.pathname.startsWith('/admin');
 
   return (
-    <div className={`flex flex-col min-h-screen bg-slate-50 text-slate-800 antialiased ${isAdminPath ? '' : 'pb-16 lg:pb-0'}`} style={{ paddingBottom: isAdminPath ? undefined : 'env(safe-area-inset-bottom)' }}>
+    <div className={`flex flex-col min-h-screen antialiased ${isAdminPath ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-800 pb-16 lg:pb-0'}`} style={{ paddingBottom: isAdminPath ? undefined : 'env(safe-area-inset-bottom)' }}>
       
       {/* Header Navigation - hide on admin */}
       {!isAdminPath && <Header />}
