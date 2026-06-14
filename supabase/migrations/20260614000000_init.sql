@@ -1,9 +1,8 @@
--- Allen Electric Database Schema
--- Run this entire script in your Supabase SQL Editor
--- Dashboard → SQL Editor → New query → Paste → Run
+-- Allen Electric Initial Database Schema Migration
+-- Sets up leads, reviews, RLS, and seeds the admin user
 
 -- ============================================================
--- Table: leads (stores bookings, quote requests, contact forms)
+-- Table: leads
 -- ============================================================
 CREATE TABLE IF NOT EXISTS leads (
   id          TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
@@ -22,7 +21,7 @@ CREATE TABLE IF NOT EXISTS leads (
 );
 
 -- ============================================================
--- Table: reviews (customer testimonials)
+-- Table: reviews
 -- ============================================================
 CREATE TABLE IF NOT EXISTS reviews (
   id       TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
@@ -42,20 +41,21 @@ ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================
 -- RLS Policies
--- Public can INSERT (submit forms and reviews)
--- Only authenticated users can SELECT / UPDATE / DELETE
 -- ============================================================
 
 -- LEADS: anyone can insert (form submissions)
 CREATE POLICY "Anyone can submit a lead"
   ON leads FOR INSERT TO anon WITH CHECK (true);
 
--- LEADS: only authenticated users (admin) can view/update
+-- LEADS: only authenticated users (admin) can view/update/delete
 CREATE POLICY "Admins can view leads"
   ON leads FOR SELECT TO authenticated USING (true);
 
 CREATE POLICY "Admins can update leads"
   ON leads FOR UPDATE TO authenticated USING (true);
+
+CREATE POLICY "Admins can delete leads"
+  ON leads FOR DELETE TO authenticated USING (true);
 
 -- REVIEWS: anyone can insert (public review submission)
 CREATE POLICY "Anyone can submit a review"
@@ -64,6 +64,13 @@ CREATE POLICY "Anyone can submit a review"
 -- REVIEWS: anyone can read reviews (public display)
 CREATE POLICY "Anyone can view reviews"
   ON reviews FOR SELECT TO anon USING (true);
+
+-- REVIEWS: authenticated users can update/delete reviews
+CREATE POLICY "Admins can update reviews"
+  ON reviews FOR UPDATE TO authenticated USING (true);
+
+CREATE POLICY "Admins can delete reviews"
+  ON reviews FOR DELETE TO authenticated USING (true);
 
 -- ============================================================
 -- Seed initial sample data
@@ -86,7 +93,9 @@ INSERT INTO leads (id, name, phone, email, service, date, time, details, status,
   ('q1', 'Marcus Vance', '+1 256-555-0144', 'marcusvance@outlook.com', 'Generator Installation', '', '', 'Need a quote for a whole-house standby generator. 24kW.', 'New', 'Exit intent popup submission.', 'quote', '2026-06-09T12:00:00Z')
 ON CONFLICT (id) DO NOTHING;
 
+-- ============================================================
 -- Seed Super Admin User (info@allenelectric.us) in auth.users
+-- ============================================================
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 DO $$
@@ -133,7 +142,7 @@ BEGIN
       ''
     );
 
-    -- Insert into auth.identities
+    -- Insert into auth.identities (needed for Supabase Auth to link provider email)
     INSERT INTO auth.identities (
       id,
       user_id,
@@ -155,4 +164,3 @@ BEGIN
     );
   END IF;
 END $$;
-

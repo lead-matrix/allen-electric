@@ -54,6 +54,19 @@ export const AdminDashboard: React.FC = () => {
   const [reviewSubmitSuccess, setReviewSubmitSuccess] = useState(false);
   const [reviewSubmitError, setReviewSubmitError] = useState('');
 
+  // Manual Lead creation states
+  const [showAddLeadModal, setShowAddLeadModal] = useState(false);
+  const [newLeadName, setNewLeadName] = useState('');
+  const [newLeadPhone, setNewLeadPhone] = useState('');
+  const [newLeadEmail, setNewLeadEmail] = useState('');
+  const [newLeadService, setNewLeadService] = useState('Panel Upgrades');
+  const [newLeadType, setNewLeadType] = useState<'booking' | 'quote' | 'contact'>('booking');
+  const [newLeadDate, setNewLeadDate] = useState('');
+  const [newLeadTime, setNewLeadTime] = useState('');
+  const [newLeadDetails, setNewLeadDetails] = useState('');
+  const [leadSubmitSuccess, setLeadSubmitSuccess] = useState(false);
+  const [leadSubmitError, setLeadSubmitError] = useState('');
+
   const loadLeads = async () => {
     try {
       const data = await dbService.getLeads();
@@ -72,6 +85,29 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  // Restore Supabase Auth session on mount
+  useEffect(() => {
+    if (supabase) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user && session.user.email === 'info@allenelectric.us') {
+          setIsLoggedIn(true);
+        }
+      });
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user && session.user.email === 'info@allenelectric.us') {
+          setIsLoggedIn(true);
+        } else if (!session) {
+          setIsLoggedIn(false);
+        }
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, []);
+
   useEffect(() => {
     if (!isLoggedIn) return;
 
@@ -82,7 +118,7 @@ export const AdminDashboard: React.FC = () => {
     setEmailLogs([
       `[${new Date().toLocaleTimeString()}] System: Email notification template listening active.`,
       `[${new Date(Date.now() - 3600000).toLocaleTimeString()}] Alert: Booking confirmation emailed to jane.doe@gmail.com.`,
-      `[${new Date(Date.now() - 7200000).toLocaleTimeString()}] Alert: Dispatch lead email dispatched to dispatch@allenelectric.co.`
+      `[${new Date(Date.now() - 7200000).toLocaleTimeString()}] Alert: Dispatch lead email dispatched to info@allenelectric.us.`
     ]);
 
     // 1. Supabase Real-time postgres listener
@@ -140,17 +176,55 @@ export const AdminDashboard: React.FC = () => {
     };
   }, [isLoggedIn]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username === 'admin' && password === 'allenelectric') {
-      setIsLoggedIn(true);
-      setLoginError('');
+    setLoginError('');
+
+    if (supabase) {
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: username,
+          password: password
+        });
+
+        if (error) {
+          // Check for fallback credentials
+          if (username === 'admin' && password === 'allenelectric') {
+            setIsLoggedIn(true);
+            return;
+          }
+          if (username === 'info@allenelectric.us' && password === 'AllenElectric2026!') {
+            setIsLoggedIn(true);
+            return;
+          }
+          setLoginError(error.message);
+        } else if (data?.user) {
+          if (data.user.email === 'info@allenelectric.us') {
+            setIsLoggedIn(true);
+          } else {
+            await supabase.auth.signOut();
+            setLoginError('Access Denied: Only the super admin (info@allenelectric.us) is authorized to view this portal.');
+          }
+        }
+      } catch (err: any) {
+        setLoginError(err.message || 'An unexpected error occurred during authentication.');
+      }
     } else {
-      setLoginError('Invalid admin username or password credentials.');
+      if (
+        (username === 'admin' && password === 'allenelectric') ||
+        (username === 'info@allenelectric.us' && password === 'AllenElectric2026!')
+      ) {
+        setIsLoggedIn(true);
+      } else {
+        setLoginError('Invalid credentials. Check database connectivity or username/password.');
+      }
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
     setIsLoggedIn(false);
     setUsername('');
     setPassword('');
@@ -248,6 +322,55 @@ export const AdminDashboard: React.FC = () => {
       ]);
     } catch (err: any) {
       setReviewSubmitError(err.message || 'Error creating review.');
+    }
+  };
+
+  const handleAddLead = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newLeadName.trim() || !newLeadPhone.trim()) {
+      setLeadSubmitError('Customer Name and Phone Number are required.');
+      return;
+    }
+
+    try {
+      await dbService.addLead({
+        name: newLeadName,
+        phone: newLeadPhone,
+        email: newLeadEmail,
+        service: newLeadService,
+        type: newLeadType,
+        date: newLeadDate || undefined,
+        time: newLeadTime || undefined,
+        details: newLeadDetails || 'Manually logged by dispatcher',
+        photoUrl: null
+      });
+
+      setLeadSubmitSuccess(true);
+      setLeadSubmitError('');
+
+      // Reset form
+      setNewLeadName('');
+      setNewLeadPhone('');
+      setNewLeadEmail('');
+      setNewLeadService('Panel Upgrades');
+      setNewLeadType('booking');
+      setNewLeadDate('');
+      setNewLeadTime('');
+      setNewLeadDetails('');
+
+      await loadLeads();
+
+      setTimeout(() => {
+        setLeadSubmitSuccess(false);
+        setShowAddLeadModal(false);
+      }, 1500);
+
+      setEmailLogs((prev) => [
+        `[${new Date().toLocaleTimeString()}] Status: Dispatcher logged a new manual lead: "${newLeadName}".`,
+        ...prev
+      ]);
+    } catch (err: any) {
+      setLeadSubmitError(err.message || 'Error creating lead.');
     }
   };
 
@@ -415,6 +538,19 @@ export const AdminDashboard: React.FC = () => {
                   Reviews Control
                 </button>
               </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setLeadSubmitSuccess(false);
+                  setLeadSubmitError('');
+                  setShowAddLeadModal(true);
+                }}
+                className="flex items-center justify-center gap-2 bg-brand-gold-500 hover:bg-brand-gold-600 text-brand-navy-950 py-2.5 px-5 rounded-xl text-xs font-bold transition-colors w-full sm:w-auto font-black shadow-md shadow-brand-gold-500/10"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Log New Lead</span>
+              </button>
 
               <button
                 onClick={handleLogout}
@@ -1029,6 +1165,148 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Add Lead Modal */}
+          {showAddLeadModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-brand-navy-950/65 backdrop-blur-sm p-4">
+              <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl max-w-md w-full relative text-left text-slate-800">
+                <button
+                  onClick={() => setShowAddLeadModal(false)}
+                  className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 focus:outline-none bg-slate-100 hover:bg-slate-200 p-1.5 rounded-full transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+
+                <form onSubmit={handleAddLead} className="space-y-4">
+                  <div className="border-b border-slate-100 pb-3">
+                    <h3 className="font-extrabold text-lg font-display text-brand-navy-900">Log New Lead</h3>
+                    <p className="text-xs text-slate-400 mt-0.5">Manually record an offline booking or quote</p>
+                  </div>
+
+                  {leadSubmitSuccess && (
+                    <div className="bg-emerald-50 border border-emerald-200/50 rounded-2xl p-4 text-emerald-800 text-xs font-semibold text-center">
+                      Lead logged successfully!
+                    </div>
+                  )}
+
+                  {leadSubmitError && (
+                    <div className="bg-red-50 border border-red-200/50 rounded-2xl p-4 text-red-800 text-xs font-semibold text-center">
+                      {leadSubmitError}
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Customer Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newLeadName}
+                      onChange={(e) => setNewLeadName(e.target.value)}
+                      placeholder="Jane Doe"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none text-slate-800"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Phone Number *</label>
+                      <input
+                        type="text"
+                        required
+                        value={newLeadPhone}
+                        onChange={(e) => setNewLeadPhone(e.target.value)}
+                        placeholder="205-555-0199"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none text-slate-800"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Email Address</label>
+                      <input
+                        type="email"
+                        value={newLeadEmail}
+                        onChange={(e) => setNewLeadEmail(e.target.value)}
+                        placeholder="jane@example.com"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none text-slate-800"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Lead Type</label>
+                      <select
+                        value={newLeadType}
+                        onChange={(e) => setNewLeadType(e.target.value as 'booking' | 'quote' | 'contact')}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none text-slate-850"
+                      >
+                        <option value="booking">Booking</option>
+                        <option value="quote">Quote Request</option>
+                        <option value="contact">General Contact</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Service Required</label>
+                      <select
+                        value={newLeadService}
+                        onChange={(e) => setNewLeadService(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none text-slate-850"
+                      >
+                        <option value="Panel Upgrades">Panel Upgrades</option>
+                        <option value="Electrical Repairs">Electrical Repairs</option>
+                        <option value="Generator Installation">Generator Installation</option>
+                        <option value="Emergency Services">Emergency Services</option>
+                        <option value="Lighting Installation">Lighting Installation</option>
+                        <option value="Commercial Services">Commercial Services</option>
+                        <option value="Other">Other Service</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {newLeadType === 'booking' && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Preferred Date</label>
+                        <input
+                          type="date"
+                          value={newLeadDate}
+                          onChange={(e) => setNewLeadDate(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none text-slate-800"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Preferred Time</label>
+                        <input
+                          type="text"
+                          value={newLeadTime}
+                          onChange={(e) => setNewLeadTime(e.target.value)}
+                          placeholder="e.g. 09:00 AM"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none text-slate-800"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Lead Details / Notes</label>
+                    <textarea
+                      value={newLeadDetails}
+                      onChange={(e) => setNewLeadDetails(e.target.value)}
+                      placeholder="Enter description of electrical issues, special instructions..."
+                      rows={3}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-1 focus:ring-brand-gold-500 focus:outline-none text-slate-800"
+                    ></textarea>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full bg-brand-navy-900 hover:bg-brand-navy-950 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-all"
+                  >
+                    Log Lead
+                  </button>
+                </form>
+              </div>
             </div>
           )}
 

@@ -71,7 +71,7 @@ export const Privacy: React.FC = () => {
           <div className="space-y-3 text-left">
             <h2 className="text-xl font-bold text-brand-navy-900 font-display">5. Your Rights</h2>
             <p>
-              You have the right to request access to the personal information we collect from you, request changes to that data, or ask us to delete it. Please contact our administrative office at <a href="mailto:dispatch@allenelectric.co" className="text-brand-gold-400 font-bold hover:underline">dispatch@allenelectric.co</a> to submit any inquiries.
+              You have the right to request access to the personal information we collect from you, request changes to that data, or ask us to delete it. Please contact our administrative office at <a href="mailto:info@allenelectric.us" className="text-brand-gold-400 font-bold hover:underline">info@allenelectric.us</a> to submit any inquiries.
             </p>
           </div>
 

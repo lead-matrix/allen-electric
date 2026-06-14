@@ -114,7 +114,7 @@ export const Contact: React.FC = () => {
               <div className="flex items-start gap-3.5 text-xs md:text-sm">
                 <Mail className="w-5 h-5 text-brand-gold-500 shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-bold text-slate-800">dispatch@allenelectric.co</p>
+                  <a href="mailto:info@allenelectric.us" className="font-bold text-slate-800 hover:text-brand-gold-500 transition-colors">info@allenelectric.us</a>
                   <p className="text-xs text-slate-400">General and billing questions</p>
                 </div>
               </div>

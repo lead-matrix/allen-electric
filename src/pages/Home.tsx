@@ -134,7 +134,7 @@ export const Home: React.FC = () => {
               "name": "Allen Electric",
               "image": "${heroImage}",
               "telephone": "+1-205-585-6431",
-              "url": "https://allenelectric.co",
+              "url": "https://allenelectric.us",
               "address": {
                 "@type": "PostalAddress",
                 "addressLocality": "Birmingham",
@@ -165,11 +165,14 @@ export const Home: React.FC = () => {
       </Helmet>
 
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex items-center justify-center bg-brand-navy-950 text-white overflow-hidden pt-12">
+      <section className="relative min-h-[85vh] flex items-center justify-center bg-gradient-to-b from-slate-900 via-brand-navy-900 to-black text-white overflow-hidden pt-12">
         {/* Background Image Overlay */}
-        <div className="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-30" style={{ backgroundImage: `url(${heroImage})` }}></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-navy-950 via-brand-navy-950/80 to-transparent"></div>
+        <div className="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-25" style={{ backgroundImage: `url(${heroImage})` }}></div>
         
+        {/* Ambient Glowing Orbs for Luxury Contrast */}
+        <div className="absolute top-0 left-1/4 w-80 h-80 bg-amber-500/10 rounded-full blur-[100px] pointer-events-none animate-pulse-slow"></div>
+        <div className="absolute bottom-10 right-1/4 w-[450px] h-[450px] bg-red-600/5 rounded-full blur-[130px] pointer-events-none"></div>
+
         {/* Tech Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] opacity-[0.03]"></div>
 

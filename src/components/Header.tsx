@@ -94,8 +94,8 @@ export const Header: React.FC = () => {
         <header
           className={`w-full transition-all duration-300 ${
             isScrolled
-              ? 'bg-black/95 backdrop-blur-lg shadow-xl shadow-black/50 border-b border-brand-gold-500/30'
-              : 'bg-brand-navy-900 border-b border-brand-gold-500/20 shadow-md'
+              ? 'bg-slate-950/95 backdrop-blur-lg shadow-xl shadow-black/50 border-b border-brand-gold-500/30'
+              : 'bg-slate-900 border-b border-slate-800 shadow-md'
           }`}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16 sm:h-18">
@@ -186,9 +186,9 @@ export const Header: React.FC = () => {
           aria-label="Mobile navigation"
           className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
             isScrolled
-              ? 'bg-brand-navy-950/98 backdrop-blur-lg'
-              : 'bg-brand-navy-900'
-          } border-b border-white/10 shadow-2xl`}
+              ? 'bg-slate-950/98 backdrop-blur-lg'
+              : 'bg-slate-900'
+          } border-b border-slate-800 shadow-2xl`}
           style={{
             maxHeight: isOpen ? '600px' : '0px',
             opacity: isOpen ? 1 : 0,
