@@ -63,12 +63,15 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
         {/* About Section */}
         <div>
-          <div className="flex items-center gap-2 mb-6">
+          <div className="flex items-center gap-3 mb-6">
             <img
               src="/logo.png"
               alt="Allen Contractors LLC Logo"
-              className="h-14 w-auto object-contain"
+              className="h-20 w-auto object-contain"
             />
+            <span className="font-display font-black text-xl sm:text-2xl tracking-tight text-white">
+              Allen <span className="text-brand-gold-400">Electric</span>
+            </span>
           </div>
           <p className="text-sm text-slate-400 mb-6 leading-relaxed">
             Powering Alabama homes and businesses with premium, reliable electrical installations and emergency repairs. Fully licensed, insured, and dedicated to safety.

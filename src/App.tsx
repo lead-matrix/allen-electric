@@ -50,43 +50,52 @@ const MobileConversionBar: React.FC = () => {
   );
 };
 
+const AppContent: React.FC = () => {
+  const location = useLocation();
+  const isAdminPath = location.pathname.startsWith('/admin');
+
+  return (
+    <div className={`flex flex-col min-h-screen bg-slate-50 text-slate-800 antialiased ${isAdminPath ? '' : 'pb-16 lg:pb-0'}`} style={{ paddingBottom: isAdminPath ? undefined : 'env(safe-area-inset-bottom)' }}>
+      
+      {/* Header Navigation - hide on admin */}
+      {!isAdminPath && <Header />}
+
+      {/* Main Content Areas */}
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/services" element={<ServicesHub />} />
+          <Route path="/services/:serviceId" element={<ServiceDetail />} />
+          <Route path="/gallery" element={<Gallery />} />
+          <Route path="/reviews" element={<Reviews />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/book" element={<BookingPage />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+        </Routes>
+      </main>
+
+      {/* Footer Component - hide on admin */}
+      {!isAdminPath && <Footer />}
+
+      {/* Exit-Intent Popup capture - hide on admin */}
+      {!isAdminPath && <ExitIntentPopup />}
+
+      {/* Mobile Bottom Conversion CTA Bar - hide on admin */}
+      {!isAdminPath && <MobileConversionBar />}
+
+    </div>
+  );
+};
+
 export const App: React.FC = () => {
   return (
     <HelmetProvider>
       <Router>
         <ScrollToTop />
-        <div className="flex flex-col min-h-screen bg-slate-50 text-slate-800 antialiased pb-16 lg:pb-0" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-          
-          {/* Header Navigation */}
-          <Header />
-
-          {/* Main Content Areas */}
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/services" element={<ServicesHub />} />
-              <Route path="/services/:serviceId" element={<ServiceDetail />} />
-              <Route path="/gallery" element={<Gallery />} />
-              <Route path="/reviews" element={<Reviews />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/book" element={<BookingPage />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-            </Routes>
-          </main>
-
-          {/* Footer Component */}
-          <Footer />
-
-          {/* Exit-Intent Popup capture */}
-          <ExitIntentPopup />
-
-          {/* Mobile Bottom Conversion CTA Bar */}
-          <MobileConversionBar />
-
-        </div>
+        <AppContent />
       </Router>
     </HelmetProvider>
   );
